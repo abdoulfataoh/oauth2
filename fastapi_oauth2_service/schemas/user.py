@@ -8,7 +8,7 @@ from pydantic import Field, SecretStr, EmailStr
 from fastapi_oauth2_service.schemas.base import IdMixin
 
 
-__all__ [
+__all__ = [
     'UserBase',
     'UserCreate',
     'User',
