@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "fastapi-oauth2-service"
+version = "0.1.0"
+description = "That's an authentification service for apps"
+authors = ["abdoulfataoh <abdoulfataoh@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = {extras = ["all"], version = "^0.111.1"}
+environs = "^11.0.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+pyjwt = "^2.8.0"
+pytz = "^2024.1"
+types-pytz = "^2024.1.0.20240417"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.31"}
+aiosqlite = "^0.20.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.26.0"
+mypy = "^1.11.0"
+flake8 = "^7.1.0"
+types-passlib = "^1.7.7.20240327"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
