@@ -14,6 +14,11 @@ from sqlalchemy import (
 from fastapi_oauth2_service.models.base import BaseModelMixin
 
 
+__all__ = [
+    'Authorization',
+]
+
+
 class Authorization(BaseModelMixin):
     __tablename__ = 'auth_authorizations'
     user_id = Column(String(64), ForeignKey('auth_users.id'), nullable=False)

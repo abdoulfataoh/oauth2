@@ -10,6 +10,11 @@ from sqlalchemy import (
 from fastapi_oauth2_service.models.base import BaseModelMixin
 
 
+__all__ = [
+    'User',
+]
+
+
 class User(BaseModelMixin):
     __tablename__ = 'auth_users'
     username = Column(String(64), unique=True, nullable=False)

@@ -5,6 +5,11 @@ from sqlalchemy import Column, String
 from fastapi_oauth2_service.models.base import BaseModelMixin
 
 
+__all__ = [
+    'Client',
+]
+
+
 class Client(BaseModelMixin):
     __tablename__ = 'auth_clients'
     client_id = Column(String(64), unique=True, nullable=False)
