@@ -8,6 +8,13 @@ from pydantic import Field, SecretStr, EmailStr
 from fastapi_oauth2_service.schemas.base import IdMixin
 
 
+__all__ [
+    'UserBase',
+    'UserCreate',
+    'User',
+]
+
+
 class UserBase(BaseModel):
     username: str
     email: EmailStr | None = None
