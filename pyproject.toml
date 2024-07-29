@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "fastapi-oauth2-service"
 version = "0.1.0"
-description = "That's an authentification service for apps"
+description = "That's an authentification with oauth2 service for apps"
 authors = ["abdoulfataoh <abdoulfataoh@gmail.com>"]
 readme = "README.md"
 
