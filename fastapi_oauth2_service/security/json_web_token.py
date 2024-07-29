@@ -10,6 +10,11 @@ import jwt
 from fastapi_oauth2_service import settings
 
 
+__all__ = [
+    'create_access_token',
+]
+
+
 def create_access_token(data: dict[Any, Any], expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
     tz = pytz.timezone(settings.TIMEZONE)
