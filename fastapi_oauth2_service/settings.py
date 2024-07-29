@@ -37,7 +37,7 @@ DATABASES = {
 DATABASE_USER = env.str('DATABASE_USER', default='')
 DATABASE_PASSWORD = env.str('DATABASE_PASSWORD', default='')
 DATABASE_SERVER = env.str('DATABASE_SERVER', default='')
-DATABASE_NAME = env.str('DATABASE_NAME', default='vela')
+DATABASE_NAME = env.str('DATABASE_NAME', default='')
 
 DB = 'default' if TEST else 'mysql'
 
