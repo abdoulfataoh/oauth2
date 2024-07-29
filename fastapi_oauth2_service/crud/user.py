@@ -4,11 +4,11 @@ from typing import Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from passlib.hash import bcrypt
 
 from fastapi_oauth2_service.schemas import UserBase as UserBaseSchemas
 from fastapi_oauth2_service.schemas import UserCreate as UserCreateSchemas
 from fastapi_oauth2_service.models import User as UserModel
+from fastapi_oauth2_service.security import secret
 from fastapi_oauth2_service.traces import trace_call
 
 
@@ -24,7 +24,7 @@ __all__ = [
 
 @trace_call
 async def create_user(db: AsyncSession, user: UserCreateSchemas) -> UserModel:
-    hashed_password = bcrypt.hash(user.password.get_secret_value())
+    hashed_password = secret.hash(user.password.get_secret_value())
     db_user = UserModel(
         username=user.username,
         email=user.email,
