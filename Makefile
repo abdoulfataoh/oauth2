@@ -11,7 +11,7 @@ help:
 
 
 flake8:
-	flake8
+	flake8 start.py fastapi_oauth2_service recipes
 
 mypy:
 	mypy start.py fastapi_oauth2_service
