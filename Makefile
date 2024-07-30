@@ -23,5 +23,5 @@ test-server:
 	uvicorn start:app --port 8000 --host 0.0.0.0 --reload
 
 reset:
-	rm -rf db.sqlite3
+	rm -f db.sqlite3
 	rm -rf **/__pycache__
