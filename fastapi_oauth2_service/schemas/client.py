@@ -2,7 +2,7 @@
 
 from uuid import uuid4
 from datetime import datetime
-import secrets
+from fastapi_oauth2_service.security import secret
 
 from pydantic import BaseModel, ConfigDict
 from pydantic import Field, SecretStr
@@ -24,7 +24,7 @@ class ClientBase(BaseModel):
 
 
 class ClientCreate(ClientBase):
-    client_secret: SecretStr = Field(default_factory=lambda: secrets.token_urlsafe(16))
+    client_secret: SecretStr = Field(default_factory=lambda: secret.generate(16))  # type: ignore
 
 
 class Client(IdMixin, ClientBase):
