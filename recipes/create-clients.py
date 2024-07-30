@@ -1,5 +1,4 @@
 # coding: utf-8
-# Copyright (C) 2024 vela
 
 from pathlib import Path
 import sys
