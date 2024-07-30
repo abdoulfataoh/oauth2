@@ -11,10 +11,10 @@ help:
 
 
 flake8:
-	flake8 app
+	flake8
 
 mypy:
-	mypy app
+	mypy start.py fastapi_oauth2_service
 
 ipython:
 	ipython
