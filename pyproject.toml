@@ -13,8 +13,9 @@ passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 pyjwt = "^2.8.0"
 pytz = "^2024.1"
 types-pytz = "^2024.1.0.20240417"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.31"}
+sqlalchemy = {extras = ["mypy"], version = "^2.0.31"}
 aiosqlite = "^0.20.0"
+sqlalchemy-stubs = "^0.4"
 
 
 [tool.poetry.group.dev.dependencies]
