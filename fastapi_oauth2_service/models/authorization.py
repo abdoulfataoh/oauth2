@@ -1,5 +1,6 @@
 # coding: utf-8
 
+from typing import TYPE_CHECKING
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     Column,
@@ -11,6 +12,9 @@ from sqlalchemy import (
 )
 
 from fastapi_oauth2_service.models.base import BaseModelMixin
+
+if TYPE_CHECKING:
+    from fastapi_oauth2_service.models.user import User  # noqa: F401
 
 
 __all__ = [

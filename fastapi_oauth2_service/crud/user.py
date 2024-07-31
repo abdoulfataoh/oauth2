@@ -41,7 +41,7 @@ async def create_user(db: AsyncSession, user: UserCreateSchemas) -> UserModel:
 
 @trace_call
 async def update_user(db: AsyncSession, user: UserBaseSchemas, user_id: str) -> UserModel | None:
-    result = await db.execute(select(UserModel).filter(UserModel.id == user_id))
+    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
     db_user = result.scalars().first()
     if db_user:
         for key, value in vars(user).items():
@@ -54,14 +54,14 @@ async def update_user(db: AsyncSession, user: UserBaseSchemas, user_id: str) -> 
 
 @trace_call
 async def get_user(db: AsyncSession, user_id: str) -> UserModel | None:
-    result = await db.execute(select(UserModel).filter(UserModel.id == user_id))
+    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
     db_user = result.scalars().first()
     return db_user
 
 
 @trace_call
 async def get_user_by_username(db: AsyncSession, username: str) -> UserModel | None:
-    result = await db.execute(select(UserModel).filter(UserModel.username == username))
+    result = await db.execute(select(UserModel).where(UserModel.username == username))
     db_user = result.scalars().first()
     return db_user
 
@@ -75,7 +75,7 @@ async def get_users(db: AsyncSession, skip: int = 0, limit: int = 10) -> Sequenc
 
 @trace_call
 async def delete_user(db: AsyncSession, user_id: int) -> UserModel | None:
-    result = await db.execute(select(UserModel).filter(UserModel.id == user_id))
+    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
     db_user = result.scalars().first()
     if db_user:
         await db.delete(db_user)

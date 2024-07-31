@@ -81,7 +81,7 @@ async def authorize(
     redirect_uri: str,
     scope: str,
     db: AsyncSession = Depends(get_db)
-):
+) -> RedirectResponse:
     del scope  # todo
     if response_type != 'code':
         raise HTTPException(status_code=400, detail='Unsupported response_type')

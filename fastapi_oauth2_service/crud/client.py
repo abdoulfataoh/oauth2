@@ -14,6 +14,6 @@ __all__ = [
 
 @trace_call
 async def get_client(db: AsyncSession, client_id: str) -> ClientModel | None:
-    result = await db.execute(select(ClientModel).filter(ClientModel.client_id == client_id))
+    result = await db.execute(select(ClientModel).where(ClientModel.client_id == client_id))
     db_client = result.scalars().first()
     return db_client
