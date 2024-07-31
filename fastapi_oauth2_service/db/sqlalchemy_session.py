@@ -14,7 +14,7 @@ __all__ = [
     'get_db',
 ]
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)  # type: ignore
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
 
 
 async def get_db() -> AsyncGenerator[Any, Any]:
