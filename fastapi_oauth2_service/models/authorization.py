@@ -27,7 +27,6 @@ class Authorization(BaseModelMixin):
     user_id = Column(String(64), ForeignKey('auth_users.id'), nullable=False)
     client_id = Column(String(64), ForeignKey('auth_clients.client_id'), nullable=False)
     authorization_code = Column(String(255), nullable=True)
-    permissions = Column(String(128), nullable=True)
     access_token = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
     scope = Column(String(255), nullable=True)
