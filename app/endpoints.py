@@ -11,12 +11,11 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter
 
-from fastapi_oauth2_service import settings
-from fastapi_oauth2_service import schemas
-from fastapi_oauth2_service.security import create_access_token
-from fastapi_oauth2_service.api import services
-from fastapi_oauth2_service import crud
-from fastapi_oauth2_service.db import get_db
+from app import settings
+from app import schemas
+from app.security import create_access_token
+from app import crud
+from app.db import get_db
 
 
 __all__ = [

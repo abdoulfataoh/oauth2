@@ -1,8 +1,8 @@
 # coding: utf-8
 
-from fastapi_oauth2_service.models.client import Client
-from fastapi_oauth2_service.models.user import User
-from fastapi_oauth2_service.models.authorization import Authorization
+from app.models.client import Client
+from app.models.user import User
+from app.models.authorization import Authorization
 
 
 __all__ = [

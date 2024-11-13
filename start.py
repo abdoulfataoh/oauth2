@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 
-from fastapi_oauth2_service.api import router
+from app.api import router
 
 
 app = FastAPI()

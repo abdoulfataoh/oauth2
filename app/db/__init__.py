@@ -2,9 +2,9 @@
 
 from sqlalchemy.ext.declarative import declarative_base
 
-from fastapi_oauth2_service.db.sqlalchemy_engine import engine
-from fastapi_oauth2_service.db.sqlalchemy_session import SessionLocal
-from fastapi_oauth2_service.db.sqlalchemy_session import get_db
+from app.db.sqlalchemy_engine import engine
+from app.db.sqlalchemy_session import SessionLocal
+from app.db.sqlalchemy_session import get_db
 
 
 __all__ = [

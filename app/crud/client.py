@@ -3,8 +3,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from fastapi_oauth2_service.models import Client as ClientModel
-from fastapi_oauth2_service.traces.function_trace import trace_call
+from app.models import Client as ClientModel
+from app.traces.function_trace import trace_call
 
 
 __all__ = [

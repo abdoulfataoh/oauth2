@@ -10,9 +10,9 @@ base_dir = Path(__file__).resolve().parent.parent
 app_dir = base_dir
 sys.path.insert(0, str(app_dir))
 
-from fastapi_oauth2_service.db import get_db  # noqa: E402
-from fastapi_oauth2_service.models import Client as ClientModel  # noqa: E402
-from fastapi_oauth2_service.schemas import ClientCreate as ClientCreateSchemas  # noqa: E402
+from app.db import get_db  # noqa: E402
+from app.models import Client as ClientModel  # noqa: E402
+from app.schemas import ClientCreate as ClientCreateSchemas  # noqa: E402
 
 
 async def create_client(db: AsyncSession):

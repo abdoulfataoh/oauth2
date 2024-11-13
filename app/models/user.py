@@ -10,10 +10,10 @@ from sqlalchemy import (
     Boolean,
 )
 
-from fastapi_oauth2_service.models.base import BaseModelMixin
+from app.models.base import BaseModelMixin
 
 if TYPE_CHECKING:
-    from fastapi_oauth2_service.models.authorization import Authorization  # noqa: F401
+    from app.models.authorization import Authorization  # noqa: F401
 
 
 __all__ = [

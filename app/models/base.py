@@ -9,7 +9,7 @@ from sqlalchemy import (
     DateTime,
 )
 
-from fastapi_oauth2_service.db import Base
+from app.db import Base
 
 
 __all__ = [

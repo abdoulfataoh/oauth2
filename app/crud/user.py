@@ -5,11 +5,10 @@ from typing import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from fastapi_oauth2_service.schemas import UserBase as UserBaseSchemas
-from fastapi_oauth2_service.schemas import UserCreate as UserCreateSchemas
-from fastapi_oauth2_service.models import User as UserModel
-from fastapi_oauth2_service.security import secret
-from fastapi_oauth2_service.traces import trace_call
+from app.utils.log import trace
+from app import schemas as S
+from app import models as M
+from app.security import secret
 
 
 __all__ = [
@@ -22,10 +21,13 @@ __all__ = [
 ]
 
 
-@trace_call
-async def create_user(db: AsyncSession, user: UserCreateSchemas) -> UserModel:
+@trace
+async def create_user(db: AsyncSession, user: S.UserCreate) -> M.User:
+    """
+    Create a new user in DB
+    """
     hashed_password = secret.hash(user.password.get_secret_value())
-    db_user = UserModel(
+    db_user = M.User(
         username=user.username,
         email=user.email,
         full_name=user.full_name,
@@ -39,9 +41,12 @@ async def create_user(db: AsyncSession, user: UserCreateSchemas) -> UserModel:
     return db_user
 
 
-@trace_call
-async def update_user(db: AsyncSession, user: UserBaseSchemas, user_id: str) -> UserModel | None:
-    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
+@trace
+async def update_user(db: AsyncSession, user: S.UserBase, user_id: str) -> M.User | None:
+    """
+    Update existing user base informations
+    """
+    result = await db.execute(select(M.User).where(M.User.id == user_id))
     db_user = result.scalars().first()
     if db_user:
         for key, value in vars(user).items():
@@ -52,33 +57,73 @@ async def update_user(db: AsyncSession, user: UserBaseSchemas, user_id: str) -> 
     return None
 
 
-@trace_call
-async def get_user(db: AsyncSession, user_id: str) -> UserModel | None:
-    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
+@trace
+async def get_user(db: AsyncSession, user_id: str) -> M.User | None:
+    """
+    Retrieve an existing user informations by id
+    """
+    result = await db.execute(select(M.User).where(M.User.id == user_id))
     db_user = result.scalars().first()
     return db_user
 
 
-@trace_call
-async def get_user_by_username(db: AsyncSession, username: str) -> UserModel | None:
-    result = await db.execute(select(UserModel).where(UserModel.username == username))
+@trace
+async def get_user_by_username(db: AsyncSession, username: str) -> M.User | None:
+    """
+    Retrieve an existing user informations by username
+    """
+    result = await db.execute(select(M.User).where(M.User.username == username))
     db_user = result.scalars().first()
     return db_user
 
 
-@trace_call
-async def get_users(db: AsyncSession, skip: int = 0, limit: int = 10) -> Sequence[UserModel]:
-    result = await db.execute(select(UserModel).offset(skip).limit(limit))
+@trace
+async def get_users(db: AsyncSession, skip: int = 0, limit: int = 10) -> Sequence[M.User]:
+    """
+    Retrieve all users informations
+    """
+    result = await db.execute(select(M.User).offset(skip).limit(limit))
     db_users = result.scalars().all()
     return db_users
 
 
-@trace_call
-async def delete_user(db: AsyncSession, user_id: int) -> UserModel | None:
-    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
+@trace
+async def delete_user(db: AsyncSession, user_id: int) -> M.User | None:
+    """
+    Delete an existing user by user_id
+    """
+    result = await db.execute(select(M.User).where(M.User.id == user_id))
     db_user = result.scalars().first()
     if db_user:
         await db.delete(db_user)
         await db.commit()
         return db_user
     return None
+
+
+@trace
+async def authenticate_user(db: AsyncSession, username: str, password: str) -> bool | S.User:
+    """
+    Auth user by username and password
+    """
+    db_user = await get_user_by_username(db, username)
+    if not db_user:
+        return False
+    user_model = S.User.model_validate(db_user)
+    if not secret.verify(password, db_user.hashed_password):
+        return False
+    return user_model
+
+
+@trace
+async def change_user_password(db: AsyncSession, username: str, password: str) -> bool | S.User:
+    """
+    Change an existing user password
+    """
+    db_user = await get_user_by_username(db, username)
+    if not db_user:
+        return False
+    user_model = S.User.model_validate(db_user)
+    if not secret.verify(password, db_user.hashed_password):
+        return False
+    return user_model

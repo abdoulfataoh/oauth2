@@ -2,7 +2,7 @@
 
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from fastapi_oauth2_service import settings
+from app import settings
 
 
 __all__ = [

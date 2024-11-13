@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from fastapi_oauth2_service.crud.user import (
+from app.crud.user import (
     create_user,
     update_user,
     get_user,
@@ -8,7 +8,13 @@ from fastapi_oauth2_service.crud.user import (
     get_users,
     delete_user,
 )
-from fastapi_oauth2_service.crud.client import get_client
+from app.crud.client import get_client
+from app.crud.authorization import (
+    create_authorization,
+    update_authorization,
+    delete_authorization,
+    get_authorizations_by_user_id,
+)
 
 __all__ = [
     'create_user',
@@ -18,4 +24,8 @@ __all__ = [
     'get_users',
     'delete_user',
     'get_client',
+    'create_authorization',
+    'update_authorization',
+    'delete_authorization',
+    'get_authorizations_by_user_id',
 ]
