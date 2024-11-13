@@ -1,8 +1,13 @@
 # coding: utf-8
 
-from fastapi_oauth2_service.schemas.client import ClientBase, ClientCreate, Client
-from fastapi_oauth2_service.schemas.user import UserBase, UserCreate, User
-from fastapi_oauth2_service.schemas.token import Token
+from app.schemas.client import ClientBase, ClientCreate, Client
+from app.schemas.user import UserBase, UserCreate, User
+from app.schemas.token import Token
+from app.schemas.authorization import (
+    AuthorizationCreate,
+    AuthorizationUpdate,
+    Authorization,
+)
 
 
 __all__ = [
@@ -13,4 +18,7 @@ __all__ = [
     'UserCreate',
     'User',
     'Token',
+    'AuthorizationCreate',
+    'AuthorizationUpdate',
+    'Authorization',
 ]

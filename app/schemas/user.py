@@ -5,7 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 from pydantic import Field, SecretStr, EmailStr
 
-from fastapi_oauth2_service.schemas.base import IdMixin
+from app.schemas._base import IdMixin
 
 
 __all__ = [

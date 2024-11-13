@@ -2,12 +2,12 @@
 
 from uuid import uuid4
 from datetime import datetime
-from fastapi_oauth2_service.security import secret
+from app.security import secret
 
 from pydantic import BaseModel, ConfigDict
 from pydantic import Field, SecretStr
 
-from fastapi_oauth2_service.schemas.base import IdMixin
+from app.schemas._base import IdMixin
 
 
 __all__ = [
