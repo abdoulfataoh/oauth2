@@ -1,5 +1,4 @@
 # coding: utf-8
-# Copyright (C) 2024 vela
 
 help:
 	@echo "make help						- Display help"
@@ -11,10 +10,10 @@ help:
 
 
 flake8:
-	flake8 start.py fastapi_oauth2_service recipes
+	flake8 start.py app recipes
 
 mypy:
-	mypy start.py fastapi_oauth2_service
+	mypy start.py app
 
 ipython:
 	ipython
