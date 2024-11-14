@@ -2,7 +2,6 @@
 
 from uuid import uuid4
 from datetime import datetime
-from app.security import secret
 
 from pydantic import BaseModel, ConfigDict
 from pydantic import Field, SecretStr
@@ -24,7 +23,7 @@ class ClientBase(BaseModel):
 
 
 class ClientCreate(ClientBase):
-    client_secret: SecretStr = Field(default_factory=lambda: secret.generate(16))  # type: ignore
+    client_secret: SecretStr
 
 
 class Client(IdMixin, ClientBase):
