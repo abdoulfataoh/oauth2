@@ -21,11 +21,11 @@ sequenceDiagram
     participant Client as ClientApplication
     participant Auth as AuthenticationBackend
 
-    User->>Client: 1. Request app acess.
+    User->>Client: 1. Request App access.
     Client-->>User: 2. 302 Redirect User to Auth.
     User->>Auth: 3. Connect Auth and Grant access to App.
-    Auth-->>User: 4. 302 Redirect to App, return authorization code.
-    User->>Client: 5. Connect to app and give authorization code.
+    Auth-->>User: 4. 302 Redirect to App, Return authorization code.
+    User->>Client: 5. Connect to App and provide authorization code.
     Client->>Auth: 6. Request Exchange authorization using an access code.
     Auth-->>Client: 7. Return access code.
 ```
