@@ -9,7 +9,13 @@
   <p>
     <a href="https://github.com/abdoulfataoh/fastapi-oauth2-service/actions/workflows/test.yaml"><img src="https://github.com/abdoulfataoh/fastapi-oauth2-service/actions/workflows/test.yaml/badge.svg"></a>
   </p>
+  <p>A FastAPI-based OAuth2 service that enables secure user authentication and authorization, providing token management and API access control for seamless integration with applications.</p>
 </div>
+
+### Features
+- [x] CRUD Users
+- [x] Reset User Password via email or sms
+- [x] Admin UI panel
 
 ### Authentification Flow
 
@@ -23,7 +29,7 @@ sequenceDiagram
 
     User->>Client: 1. Request App access.
     Client-->>User: 2. 302 Redirect User to Auth.
-    User->>Auth: 3. Connect Auth and Grant access to App.
+    User->>Auth: 3. Connect to Auth and grant access to the app using the user's username, password and 2FA.
     Auth-->>User: 4. 302 Redirect to App, Return authorization code.
     User->>Client: 5. Connect to App and provide authorization code.
     Client->>Auth: 6. Request Exchange authorization using an access code.
