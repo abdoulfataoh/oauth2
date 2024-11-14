@@ -26,7 +26,7 @@ sequenceDiagram
     User->>Auth: 3. Connect Auth and Grant access to App.
     Auth-->>User: 4. 302 Redirect to App, return authorization code.
     User->>Client: 5. Connect to app and give authorization code.
-    Client->>Auth: 6. Connect and request Exchange authorization using an access code.
+    Client->>Auth: 6. Request Exchange authorization using an access code.
     Auth-->>Client: 7. Return access code.
 ```
 
