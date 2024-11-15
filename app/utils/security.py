@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from passlib.hash import bcrypt
+from hashlib import sha256
 import secrets
 from typing import Any, Optional
 from datetime import datetime, timedelta
@@ -23,21 +24,25 @@ class Secret:
     def __init__(self) -> None:
         pass
 
-    def hash(self, secret: str) -> str:
+    @staticmethod
+    def hash(secret: str) -> str:
         hash = bcrypt.hash(secret)
         return hash
 
-    def verify_hash(self, secret: str, hash: str) -> bool:
+    @staticmethod
+    def verify_hash(secret: str, hash: str) -> bool:
         status = bcrypt.verify(secret, hash)
         return status
 
-    def generate_secret(self, length: int = 32) -> str:
+    @staticmethod
+    def generate_secret(length: int = 32) -> str:
         secret = secrets.token_urlsafe(length)
         return secret
 
+    @staticmethod
     def create_access_token(
-            self, data: dict[Any, Any], 
-            expires_delta: Optional[timedelta] = None
+        data: dict[Any, Any],
+        expires_delta: Optional[timedelta] = None
     ) -> str:
         to_encode = data.copy()
         tz = pytz.timezone(settings.TIMEZONE)
@@ -53,3 +58,13 @@ class Secret:
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
         return encoded_jwt
+
+
+def generate_username(firstname: str, lastname: str, phone_number) -> str:
+    """
+    Generate an username from user informations
+    """
+    combo = f'{firstname}_{lastname}_{phone_number}'.lower()
+    combo_hash = sha256(combo).hexdigest()
+    username = f'{firstname}.{lastname}.{combo_hash[:8]}'
+    return username
