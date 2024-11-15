@@ -8,16 +8,12 @@ from sqlalchemy.future import select
 from app.utils.log import trace
 from app import schemas as S
 from app import models as M
-from app.security import secret
+from app.utils.security import Secret, generate_username
 
 
 __all__ = [
-    'create_user',
-    'update_user',
-    'get_user',
-    'get_user_by_username',
-    'get_users',
-    'delete_user',
+    'create_user', 'update_user', 'get_user',
+    'get_user_by_username', 'get_users', 'delete_user',
 ]
 
 
@@ -26,14 +22,14 @@ async def create_user(db: AsyncSession, user: S.UserCreate) -> M.User:
     """
     Create a new user in DB
     """
-    hashed_password = secret.hash(user.password.get_secret_value())
+    password_hash = Secret.hash(user.password.get_secret_value())
+    username = generate_username(
+        user.firstname, user.lastname, user.phone_number
+    )
     db_user = M.User(
-        username=user.username,
-        email=user.email,
-        full_name=user.full_name,
-        phone_number=user.phone_number,
-        disabled=True,
-        hashed_password=hashed_password,
+        username=username, firstname=user.firstname, lastname=user.lastname,
+        email=user.email, phone_number=user.phone_number,
+        disabled=True, hashed_password=password_hash,
     )
     db.add(db_user)
     await db.commit()
@@ -110,7 +106,7 @@ async def authenticate_user(db: AsyncSession, username: str, password: str) -> b
     if not db_user:
         return False
     user_model = S.User.model_validate(db_user)
-    if not secret.verify(password, db_user.hashed_password):
+    if not Secret.verify(password, db_user.password_hash):
         return False
     return user_model
 
@@ -124,6 +120,6 @@ async def change_user_password(db: AsyncSession, username: str, password: str) -
     if not db_user:
         return False
     user_model = S.User.model_validate(db_user)
-    if not secret.verify(password, db_user.hashed_password):
+    if not Secret.verify(password, db_user.password_hash):
         return False
     return user_model
