@@ -5,40 +5,36 @@ from typing import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.models import Authorization as AuthorizationModel
-from app.schemas import AuthorizationCreate
-from app.traces import trace_call
+from app import schemas as S
+from app import models as M
+from app.utils.log import trace
 
 
 __all__ = [
-    'create_authorization',
-    'update_authorization',
-    'delete_authorization',
-    'get_authorizations_by_user_id',
+    'create_authorization', 'update_authorization',
+    'delete_authorization', 'get_authorizations_by_user_id',
 ]
 
 
-@trace_call
+@trace
 async def create_authorization(
-    db: AsyncSession,
-    authorization: AuthorizationCreate
-) -> AuthorizationModel:
-
-    db_authorization = AuthorizationModel(**authorization.model_dump())
+    db: AsyncSession, authorization: S.AuthorizationCreate
+) -> M.Authorization:
+    db_authorization = M.Authorization(**authorization.model_dump())
     db.add(db_authorization)
     await db.commit()
     await db.refresh(db_authorization)
     return db_authorization
 
 
-@trace_call
+@trace
 async def update_authorization(
     db: AsyncSession,
     authorization_id: str,
-    authorization: AuthorizationCreate
-) -> AuthorizationModel:
+    authorization: S.AuthorizationCreate
+) -> M.Authorization:
 
-    result = await db.execute(select(AuthorizationModel).where(AuthorizationModel.id == authorization_id))
+    result = await db.execute(select(M.Authorization).where(M.Authorization.id == authorization_id))
     db_authorization = result.scalars().first()
 
     if db_authorization:
@@ -50,9 +46,9 @@ async def update_authorization(
     return None
 
 
-@trace_call
-async def delete_authorization(db: AsyncSession, authorization_id: int) -> AuthorizationModel | None:
-    result = await db.execute(select(AuthorizationModel).where(AuthorizationModel.id == authorization_id))
+@trace
+async def delete_authorization(db: AsyncSession, authorization_id: int) -> M.Authorization | None:
+    result = await db.execute(select(M.Authorization).where(M.Authorization.id == authorization_id))
     db_authorization = result.scalars().first()
     if db_authorization:
         await db.delete(db_authorization)
@@ -61,8 +57,8 @@ async def delete_authorization(db: AsyncSession, authorization_id: int) -> Autho
     return None
 
 
-@trace_call
-async def get_authorizations_by_user_id(db: AsyncSession, user_id: str) -> Sequence[AuthorizationModel]:
-    result = await db.execute(select(AuthorizationModel).where(AuthorizationModel.user_id == user_id))
+@trace
+async def get_authorizations_by_user_id(db: AsyncSession, user_id: str) -> Sequence[M.Authorization]:
+    result = await db.execute(select(M.Authorization).where(M.Authorization.user_id == user_id))
     db_authorizations = result.scalars().all()
     return db_authorizations
