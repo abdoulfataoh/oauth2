@@ -29,5 +29,5 @@ class User(BaseModelMixin):
     lastname = Column(String(128), nullable=True)
     phone_number = Column(String(32), unique=True, nullable=True)
     disabled = Column(Boolean, default=False)
-    hashed_password = Column(String, nullable=False)
+    password_hash = Column(String, nullable=False)
     authorizations = relationship('Authorization', back_populates='user')
