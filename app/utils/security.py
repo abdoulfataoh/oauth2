@@ -64,7 +64,7 @@ def generate_username(firstname: str, lastname: str, phone_number) -> str:
     """
     Generate an username from user informations
     """
-    combo = f'{firstname}_{lastname}_{phone_number}'.lower()
+    combo = f'{firstname}_{lastname}_{phone_number}'.lower().encode()
     combo_hash = sha256(combo).hexdigest()
-    username = f'{firstname}.{lastname}.{combo_hash[:8]}'
+    username = f'{firstname}.{lastname}.{combo_hash[:8]}'.lower()
     return username
