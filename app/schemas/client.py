@@ -1,9 +1,7 @@
 # coding: utf-8
 
-from uuid import uuid4
-
 from pydantic import BaseModel, ConfigDict
-from pydantic import Field, SecretStr
+from pydantic import SecretStr
 
 from app.schemas._base import IdMixin, TimestampMixin
 
@@ -16,7 +14,6 @@ __all__ = [
 
 
 class ClientBase(BaseModel):
-    client_id: str = Field(default_factory=lambda: str(uuid4()))
     client_secret: SecretStr
 
 
@@ -25,8 +22,9 @@ class ClientCreate(BaseModel):
     client_name: str
 
 
-class Client(IdMixin, ClientBase, ClientCreate, TimestampMixin):
+class Client(IdMixin, ClientCreate, TimestampMixin):
     """
     Client in DB representation
     """
     model_config = ConfigDict(from_attributes=True)
+    client_id: str
