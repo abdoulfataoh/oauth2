@@ -5,7 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 from pydantic import Field, SecretStr, EmailStr
 
-from app.schemas._base import IdMixin
+from app.schemas._base import IdMixin, TimestampMixin
 
 
 __all__ = [
@@ -28,8 +28,8 @@ class UserCreate(UserBase):
     password: SecretStr
 
 
-class User(IdMixin, UserBase):
+class User(IdMixin, UserBase, TimestampMixin):
+    """
+    User in DB representation
+    """
     model_config = ConfigDict(from_attributes=True)
-
-    created_at: datetime = Field(default_factory=datetime.now)
-    edited_at: datetime | None = None
