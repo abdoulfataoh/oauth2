@@ -1,7 +1,7 @@
 # coding: utf-8
 
-from app.traces.function_trace import trace_call
+from app.utils.log import trace
 
 __all__ = [
-    'trace_call',
+    'trace',
 ]
