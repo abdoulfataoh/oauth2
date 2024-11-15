@@ -14,6 +14,7 @@ from app.utils.security import Secret, generate_username
 __all__ = [
     'create_user', 'update_user', 'get_user',
     'get_user_by_username', 'get_users', 'delete_user',
+    'authenticate_user', 'change_user_password',
 ]
 
 
@@ -106,7 +107,7 @@ async def authenticate_user(db: AsyncSession, username: str, password: str) -> b
     if not db_user:
         return False
     user_model = S.User.model_validate(db_user)
-    if not Secret.verify(password, db_user.password_hash):
+    if not Secret.verify_hash(password, db_user.password_hash):
         return False
     return user_model
 
