@@ -14,6 +14,22 @@ class InvalidUserSchemeException(HTTPException):
         super().__init__(status_code=400, detail=detail)
 
 
+class UnsupportedResponseTypeException(HTTPException):
+    def __init__(self, detail: str = "Unsupported response type."):
+        super().__init__(status_code=400, detail=detail)
+
+
+class RedirectUriMismatchException(HTTPException):
+    def __init__(self, detail: str = "Redirect URI does not match the registered URI."):
+        super().__init__(status_code=400, detail=detail)
+
+
+# 401
+class LoginFailedException(HTTPException):
+    def __init__(self, detail: str = "Login failed. Invalid username or password."):
+        super().__init__(status_code=401, detail=detail)
+
+
 # 403
 class InvalidAuthenticationSchemeException(HTTPException):
     def __init__(self, detail: str = "Invalid authentication scheme."):
