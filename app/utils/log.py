@@ -7,7 +7,7 @@ from typing import Callable, Any, TypeVar
 logger = logging.getLogger(__name__)
 
 __all__ = [
-    'trace_call',
+    'trace',
 ]
 
 T = TypeVar('T')
