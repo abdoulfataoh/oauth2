@@ -1,8 +1,9 @@
 # coding: utf-8
 
 from uuid import uuid4
+from datetime import datetime
+import pytz
 
-from sqlalchemy.sql import func
 from sqlalchemy import (
     Column,
     String,
@@ -20,5 +21,5 @@ __all__ = [
 class BaseModelMixin(Base):
     __abstract__ = True
     id = Column(String(64), primary_key=True, default=lambda: str(uuid4()))
-    created_at = Column(DateTime, server_default=func.now())
-    edited_at = Column(DateTime, onupdate=func.now())
+    created_at = Column(DateTime, default=lambda x: datetime.now(tz=pytz.utc))
+    edited_at = Column(DateTime, onupdate=lambda x: datetime.now(tz=pytz.utc))
