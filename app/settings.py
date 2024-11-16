@@ -48,12 +48,11 @@ SQLALCHEMY_DATABASE_URL = DATABASES[DB]['url'].format(
     db=DATABASE_NAME
 )
 
-# [ Authentification Server ]
-AUTH_SERVER_AUTHORIZATION = env.str('AUTH_SERVER_AUTHORIZATION', default='http://localhost:8000/oauth2/authorization')
-AUTH_SERVER_TOKEN = env.str('AUTH_SERVER_TOKEN', default='http://localhost:8000/oauth2/token')
-OAUTH2_SECRET_KEY = env.str('OAUTH2_SECRET_KEY', default='')
-OAUTH2_ALGORITHM = env.str('OAUTH2_ALGORITHM', default='HS256')
-OAUTH2_ACCESS_TOKEN_EXPIRE_MINUTES = env.int('OAUTH2_ACCESS_TOKEN_EXPIRE_MINUTES', default=30)
+# [ Secret ]
+SECRET_KEY = env.str('SECRET_KEY', default='1234')
+JWT_ALGORITHM = env.str('JWT_ALGORITHM', default='HS256')
+ACCESS_TOKEN_EXPIRE_MINUTES = env.int('ACCESS_TOKEN_EXPIRE_MINUTES', default=60*60)
+
 
 # [ General ]
 TIMEZONE = env.str('TIMEZONE', default='UTC')
