@@ -3,7 +3,6 @@
 from passlib.hash import bcrypt
 from hashlib import sha256
 import secrets
-from typing import Any, Optional
 from datetime import datetime, timedelta
 import pytz
 import jwt
@@ -12,52 +11,34 @@ from app import settings
 
 
 __all__ = [
-    'Secret',
+    'hash', 'verify_hash', 'generate_secret',
+    'generate_username', 'generate_username',
+    'create_jwt',
 ]
 
 
-class Secret:
+def hash(secret: str) -> str:
     """
-    Collection of tools to manage secrets
+    Hash a given secret
     """
+    hash = bcrypt.hash(secret)
+    return hash
 
-    def __init__(self) -> None:
-        pass
 
-    @staticmethod
-    def hash(secret: str) -> str:
-        hash = bcrypt.hash(secret)
-        return hash
+def verify_hash(secret: str, hash: str) -> bool:
+    """
+    Check is secret and hashed secret match
+    """
+    status = bcrypt.verify(secret, hash)
+    return status
 
-    @staticmethod
-    def verify_hash(secret: str, hash: str) -> bool:
-        status = bcrypt.verify(secret, hash)
-        return status
 
-    @staticmethod
-    def generate_secret(length: int = 32) -> str:
-        secret = secrets.token_urlsafe(length)
-        return secret
-
-    @staticmethod
-    def create_access_token(
-        data: dict[Any, Any],
-        expires_delta: Optional[timedelta] = None
-    ) -> str:
-        to_encode = data.copy()
-        tz = pytz.timezone(settings.TIMEZONE)
-        secret_key = settings.OAUTH2_SECRET_KEY
-        algorithm = settings.OAUTH2_ALGORITHM
-        now = datetime.now(tz)
-
-        if expires_delta:
-            expire = now + expires_delta
-        else:
-            expire = now + timedelta(minutes=15)
-
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
-        return encoded_jwt
+def generate_secret(length: int = 32) -> str:
+    """
+    Generate a random secret size = length
+    """
+    secret = secrets.token_urlsafe(length)
+    return secret
 
 
 def generate_username(firstname: str, lastname: str, phone_number) -> str:
@@ -68,3 +49,30 @@ def generate_username(firstname: str, lastname: str, phone_number) -> str:
     combo_hash = sha256(combo).hexdigest()
     username = f'{firstname}.{lastname}.{combo_hash[:8]}'.lower()
     return username
+
+
+def create_jwt(user_id: str, expires_in: int = 3600) -> str:
+    """
+    Create signed JSON Web Token (JWT).
+
+    Args:
+        user_id (str): user (or entity) id
+        expires_in (int): token expire date
+
+    Returns:
+        str: signed JWT.
+    """
+
+    tz = pytz.timezone(settings.TIMEZONE)
+    secret_key = settings.SECRET_KEY
+    jwt_algorithm = settings.JWT_ALGORITHM
+
+    payload = {
+        'sub': user_id,
+        'iat': datetime.now(tz=tz),
+        'exp': datetime.now(tz=tz) + timedelta(seconds=expires_in),
+    }
+
+    token = jwt.encode(payload, secret_key, algorithm=jwt_algorithm)
+
+    return token
