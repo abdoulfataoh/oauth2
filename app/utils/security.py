@@ -8,6 +8,9 @@ import pytz
 import jwt
 
 from app import settings
+from app.utils.exceptions import (
+    InvalidTokenException, ExpiredTokenException, TokenDecodeException
+)
 
 
 __all__ = [
@@ -74,5 +77,36 @@ def create_jwt(user_id: str, expires_in: int = 3600) -> str:
     }
 
     token = jwt.encode(payload, secret_key, algorithm=jwt_algorithm)
-
     return token
+
+
+def decode_jwt(token: str) -> dict:
+    """
+    Decode signed JSON Web Token (JWT).
+
+    Args:
+        token (str): JWT to decode.
+
+    Returns:
+        dict: jwt paylod.
+
+    Raises:
+        HTTPException: token exceptions.
+    """
+    tz = pytz.timezone(settings.TIMEZONE)
+    secret_key = settings.SECRET_KEY
+    jwt_algorithm = settings.JWT_ALGORITHM
+
+    try:
+        decoded_payload = jwt.decode(token, secret_key, algorithms=[jwt_algorithm])
+        if decoded_payload['exp'] < datetime.now(tz=tz).timestamp():
+            raise ExpiredTokenException
+
+        return decoded_payload
+
+    except jwt.ExpiredSignatureError:
+        raise ExpiredTokenException
+    except jwt.ExpiredSignatureError:
+        raise InvalidTokenException
+    except jwt.DecodeError:
+        raise TokenDecodeException
