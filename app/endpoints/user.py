@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from typing import Annotated
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from fastapi import Depends
@@ -11,6 +13,7 @@ from app.utils.exceptions import (
 from app import schemas as S
 from app import crud as CRUD
 from app.db import get_db
+from app.helpers._security import check_user
 
 
 __all__ = [
@@ -54,3 +57,14 @@ async def delete_user(user_id: str, db: AsyncSession = Depends(get_db)) -> S.Use
         raise UserNotFoundException
     user_data = S.User.model_validate(db_user)
     return user_data
+
+
+@router.post('oauth2/users/me')
+async def me(
+    current_user: Annotated[S.User, Depends(check_user)],
+    db: AsyncSession = Depends(get_db),
+) -> S.User:
+    """
+    Retrieve current user informations
+    """
+    return current_user
