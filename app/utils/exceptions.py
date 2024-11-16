@@ -30,6 +30,21 @@ class LoginFailedException(HTTPException):
         super().__init__(status_code=401, detail=detail)
 
 
+class InvalidTokenException(HTTPException):
+    def __init__(self, detail: str = "Invalid token. The provided token is not valid."):
+        super().__init__(status_code=401, detail=detail)
+
+
+class ExpiredTokenException(HTTPException):
+    def __init__(self, detail: str = "Token has expired. Please re-authenticate."):
+        super().__init__(status_code=401, detail=detail)
+
+
+class TokenDecodeException(HTTPException):
+    def __init__(self, detail: str = "Error decoding token. The token format may be invalid."):
+        super().__init__(status_code=401, detail=detail)
+
+
 # 403
 class InvalidAuthenticationSchemeException(HTTPException):
     def __init__(self, detail: str = "Invalid authentication scheme."):
