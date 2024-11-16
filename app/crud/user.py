@@ -8,7 +8,7 @@ from sqlalchemy.future import select
 from app.utils.log import trace
 from app import schemas as S
 from app import models as M
-from app.utils.security import Secret, generate_username
+from app.utils.security import hash, verify_hash, generate_username
 
 
 __all__ = [
@@ -23,7 +23,7 @@ async def create_user(db: AsyncSession, user: S.UserCreate) -> M.User:
     """
     Create a new user in DB
     """
-    password_hash = Secret.hash(user.password.get_secret_value())
+    password_hash = hash(user.password.get_secret_value())
     username = generate_username(
         user.firstname, user.lastname, user.phone_number
     )
@@ -107,7 +107,7 @@ async def authenticate_user(db: AsyncSession, username: str, password: str) -> b
     if not db_user:
         return False
     user_model = S.User.model_validate(db_user)
-    if not Secret.verify_hash(password, db_user.password_hash):
+    if not verify_hash(password, db_user.password_hash):
         return False
     return user_model
 
@@ -121,6 +121,6 @@ async def change_user_password(db: AsyncSession, username: str, password: str) -
     if not db_user:
         return False
     user_model = S.User.model_validate(db_user)
-    if not Secret.verify(password, db_user.password_hash):
+    if not verify_hash(password, db_user.password_hash):
         return False
     return user_model

@@ -8,7 +8,7 @@ from sqlalchemy.future import select
 from app import schemas as S
 from app import models as M
 from app.utils.log import trace
-from app.utils.security import Secret
+from app.utils.security import hash, generate_secret
 
 
 __all__ = [
@@ -22,13 +22,13 @@ async def create_client(db: AsyncSession, client: S.ClientCreate) -> M.Client:
     """
     Create a new client application
     """
-    client_secret = Secret.generate_secret(16)
-    client_secret_hash = Secret.hash(client_secret)
+    client_secret = generate_secret(16)
+    client_secret_hash = hash(client_secret)
 
     db_client = M.Client(
         client_name=client.client_name,
         redirect_uri=client.redirect_uri,
-        client_id=Secret.generate_secret(16),
+        client_id=generate_secret(16),
         client_secret=client_secret_hash
     )
     db.add(db_client)
