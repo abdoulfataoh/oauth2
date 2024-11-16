@@ -24,8 +24,8 @@ async def create_session(db: AsyncSession, username: str) -> M.Session:
         expires_at=expires_at
     )
     db.add(db_session)
-    db.commit()
-    db.refresh(db_session)
+    await db.commit()
+    await db.refresh(db_session)
     return db_session
 
 
