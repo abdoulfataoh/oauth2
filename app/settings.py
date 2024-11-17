@@ -8,6 +8,10 @@ from environs import Env
 env = Env()
 env.read_env()
 
+# Vars
+MINUTE = 60
+HOUR = MINUTE * 60
+
 # [ Trace ]
 TEST = env.bool('TEST', default=True)
 DEBUG = TEST
@@ -41,18 +45,18 @@ DATABASE_NAME = env.str('DATABASE_NAME', default='')
 
 DB = 'default' if TEST else 'mysql'
 
-SQLALCHEMY_DATABASE_URL = DATABASES[DB]['url'].format(
+_DATABASE_URL_ = DATABASES[DB]['url'].format(
     user=DATABASE_USER,
     password=DATABASE_PASSWORD,
     server=DATABASE_SERVER,
     db=DATABASE_NAME
 )
+DATABASE_URL = env.str('DATABASE_URL', default=_DATABASE_URL_)
 
 # [ Secret ]
 SECRET_KEY = env.str('SECRET_KEY', default='1234')
 JWT_ALGORITHM = env.str('JWT_ALGORITHM', default='HS256')
 ACCESS_TOKEN_EXPIRE_MINUTES = env.int('ACCESS_TOKEN_EXPIRE_MINUTES', default=60*60)
-
 
 # [ General ]
 TIMEZONE = env.str('TIMEZONE', default='UTC')
