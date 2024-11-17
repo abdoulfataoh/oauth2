@@ -10,5 +10,5 @@ __all__ = [
 ]
 
 engine = create_async_engine(
-    settings.SQLALCHEMY_DATABASE_URL,
+    settings.DATABASE_URL,
 )
