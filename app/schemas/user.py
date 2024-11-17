@@ -30,4 +30,8 @@ class User(IdMixin, UserBase, TimestampMixin):
     """
     model_config = ConfigDict(from_attributes=True)
     username: str
+    roles: list[str] | str = 'user'
     disabled: bool | None = None
+
+    def model_post_init(self, __context):
+        self.roles = self.roles.split(',')
