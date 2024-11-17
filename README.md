@@ -17,7 +17,7 @@
 - [x] Reset User Password via email or sms
 - [x] Admin UI panel
 
-### Authentification Flow
+### Oauth2 code Flow
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': 'transparent', 'secondaryColor': 'transparent', 'tertiaryColor': 'transparent', 'actorTextColor': '#000000', 'lineColor': '#00FF00', 'primaryBorderColor': '#9c1ca3'}}}%%
