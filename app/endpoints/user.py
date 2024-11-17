@@ -60,10 +60,7 @@ async def delete_user(user_id: str, db: AsyncSession = Depends(get_db)) -> S.Use
 
 
 @router.post('oauth2/users/me')
-async def me(
-    current_user: Annotated[S.User, Depends(check_user)],
-    db: AsyncSession = Depends(get_db),
-) -> S.User:
+async def me(current_user: Annotated[S.User, Depends(check_user)],) -> S.User:
     """
     Retrieve current user informations
     """
