@@ -2,7 +2,9 @@
   <p>
     <a href="https://pypi.org/project/fastapi_oauth2_service/"><img src="https://github.com/abdoulfataoh/fastapi-oauth2-service/blob/master/docs/icon.png" style="width:80px;height:80px;"></a>
   </p>
-  <h3>fastapi oauth2 service</h3>
+  <a href="https://git.io/typing-svg">
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=E9205E&width=170&lines=Oauth+service" alt="Typing SVG" />
+  </a>
 </div>
 
 <div align="center">
