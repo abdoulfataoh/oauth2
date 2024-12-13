@@ -12,6 +12,7 @@ from app.utils.security import create_jwt
 from app import schemas as S
 from app import crud as CRUD
 from app.db import get_db
+from app.settings import API_PREFIX
 
 
 __all__ = [
@@ -22,7 +23,7 @@ __all__ = [
 router = APIRouter()
 
 
-@router.post('/oauth2/token')
+@router.post(f'/{API_PREFIX}/token')
 async def login(
     login_form: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: AsyncSession = Depends(get_db),
