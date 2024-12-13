@@ -39,7 +39,7 @@ async def create_user(db: AsyncSession, user: S.UserCreate) -> M.User:
 
 
 @trace
-async def update_user(db: AsyncSession, user: S.UserBase, user_id: str) -> M.User | None:
+async def update_user(db: AsyncSession, user: S.UserUpdate, user_id: str) -> M.User | None:
     """
     Update existing user base informations
     """
