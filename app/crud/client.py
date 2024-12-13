@@ -8,7 +8,7 @@ from sqlalchemy.future import select
 from app import schemas as S
 from app import models as M
 from app.utils.log import trace
-from app.utils.security import hash, generate_secret
+from app.utils.security import generate_secret
 
 
 __all__ = [
@@ -23,13 +23,13 @@ async def create_client(db: AsyncSession, client: S.ClientCreate) -> M.Client:
     Create a new client application
     """
     client_secret = generate_secret(16)
-    client_secret_hash = hash(client_secret)
+    # client_secret_hash = hash(client_secret)
 
     db_client = M.Client(
         client_name=client.client_name,
         redirect_uri=client.redirect_uri,
         client_id=generate_secret(16),
-        client_secret=client_secret_hash
+        client_secret=client_secret
     )
     db.add(db_client)
     await db.commit()
@@ -53,7 +53,7 @@ async def get_client(db: AsyncSession, client_id: str) -> M.Client | None:
     """
     Retrieve an existing client informations by client_id
     """
-    result = await db.execute(select(M.Client).where(M.Client.client_id == client_id))
+    result = await db.execute(select(M.Client).where(M.Client.id == client_id))
     db_client = result.scalars().first()
     return db_client
 
@@ -63,7 +63,7 @@ async def delete_client(db: AsyncSession, client_id: int) -> M.Client | None:
     """
     Delete an existing client by client_id
     """
-    result = await db.execute(select(M.Client).where(M.Client.client_id == client_id))
+    result = await db.execute(select(M.Client).where(M.Client.id == client_id))
     db_client = result.scalars().first()
     if db_client:
         await db.delete(db_client)
