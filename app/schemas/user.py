@@ -9,6 +9,7 @@ from app.schemas._base import IdMixin, TimestampMixin
 __all__ = [
     'UserBase',
     'UserCreate',
+    'UserUpdate',
     'User',
 ]
 
@@ -16,15 +17,22 @@ __all__ = [
 class UserBase(BaseModel):
     firstname: str | None = None
     lastname: str | None = None
+
+
+class UserCommon(UserBase):
     email: EmailStr | None = None
     phone_number: str | None = Field(min_length=8, max_length=32)
 
 
-class UserCreate(UserBase):
+class UserUpdate(UserCommon):
+    roles: list[str] | str = 'user'
+
+
+class UserCreate(UserCommon):
     password: SecretStr
 
 
-class User(IdMixin, UserBase, TimestampMixin):
+class User(IdMixin, UserCommon, TimestampMixin):
     """
     User in DB representation
     """

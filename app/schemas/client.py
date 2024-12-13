@@ -27,4 +27,5 @@ class Client(IdMixin, ClientCreate, TimestampMixin):
     Client in DB representation
     """
     model_config = ConfigDict(from_attributes=True)
+    client_secret: str
     client_id: str
