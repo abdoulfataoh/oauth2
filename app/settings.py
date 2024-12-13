@@ -54,6 +54,7 @@ _DATABASE_URL_ = DATABASES[DB]['url'].format(
 DATABASE_URL = env.str('DATABASE_URL', default=_DATABASE_URL_)
 
 # [ Secret ]
+API_PREFIX = env.str('API_PREFIX', default='oauth')
 SECRET_KEY = env.str('SECRET_KEY', default='1234')
 JWT_ALGORITHM = env.str('JWT_ALGORITHM', default='HS256')
 ACCESS_TOKEN_EXPIRE_MINUTES = env.int('ACCESS_TOKEN_EXPIRE_MINUTES', default=60*60)
