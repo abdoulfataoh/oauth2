@@ -93,20 +93,16 @@ def decode_jwt(token: str) -> dict:
     Raises:
         HTTPException: token exceptions.
     """
-    tz = pytz.timezone(settings.TIMEZONE)
     secret_key = settings.SECRET_KEY
     jwt_algorithm = settings.JWT_ALGORITHM
 
     try:
         decoded_payload = jwt.decode(token, secret_key, algorithms=[jwt_algorithm])
-        if decoded_payload['exp'] < datetime.now(tz=tz).timestamp():
-            raise ExpiredTokenException
-
         return decoded_payload
 
     except jwt.ExpiredSignatureError:
         raise ExpiredTokenException
-    except jwt.ExpiredSignatureError:
+    except jwt.exceptions.InvalidTokenError:
         raise InvalidTokenException
     except jwt.DecodeError:
         raise TokenDecodeException
