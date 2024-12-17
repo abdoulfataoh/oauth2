@@ -18,8 +18,8 @@ mypy:
 ipython:
 	ipython
 
-test-server:
-	uvicorn start:app --port 8000 --host 0.0.0.0 --reload
+run-dev:
+	fastapi dev start.py --host 0.0.0.0 --reload
 
 reset:
 	rm -f db.sqlite3
