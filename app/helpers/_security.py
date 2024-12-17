@@ -6,12 +6,13 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
 from app import schemas as S
 from app.utils.security import decode_jwt
 from app import crud as CRUD
 from app.db import get_db
-from app.utils.exceptions import UserNotFoundException
+from app.utils.exceptions import (
+    UserNotFoundException,
+)
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/oauth2/token')
@@ -29,5 +30,5 @@ async def check_user(
     db_user = await CRUD.get_user(db=db, user_id=user_id)
     if not db_user:
         UserNotFoundException
-    user_data = S.User.model_validate(db_user)
-    return user_data
+    user_model = S.User.model_validate(db_user)
+    return user_model
