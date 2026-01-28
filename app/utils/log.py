@@ -3,12 +3,7 @@
 import logging
 from typing import Callable, Any, TypeVar
 
-
 logger = logging.getLogger(__name__)
-
-__all__ = [
-    'trace',
-]
 
 T = TypeVar('T')
 R = TypeVar('R')
