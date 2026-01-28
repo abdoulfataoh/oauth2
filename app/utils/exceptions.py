@@ -1,105 +1,140 @@
 # coding: utf-8
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 
-# 400
-class ParsingFileFailedException(HTTPException):
+class AppException(HTTPException):
+    """Base exception for the application"""
+    pass
+
+
+# 400 BAD REQUEST
+class ParsingFileFailedException(AppException):
     def __init__(self, detail: str = "Parsing file failed."):
-        super().__init__(status_code=400, detail=detail)
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail)
 
 
-class InvalidUserSchemeException(HTTPException):
+class InvalidUserSchemeException(AppException):
     def __init__(self, detail: str = "Invalid user scheme."):
-        super().__init__(status_code=400, detail=detail)
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail)
 
 
-class UnsupportedResponseTypeException(HTTPException):
+class UnsupportedResponseTypeException(AppException):
     def __init__(self, detail: str = "Unsupported response type."):
-        super().__init__(status_code=400, detail=detail)
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail)
 
 
-class RedirectUriMismatchException(HTTPException):
+class UnsupportedGrantTypeException(AppException):
+    def __init__(self, detail: str = "Unsupported grant type."):
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail)
+
+
+class RedirectUriMismatchException(AppException):
     def __init__(self, detail: str = "Redirect URI does not match the registered URI."):
-        super().__init__(status_code=400, detail=detail)
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail)
 
 
-# 401
-class LoginFailedException(HTTPException):
-    def __init__(self, detail: str = "Login failed. Invalid username or password."):
-        super().__init__(status_code=401, detail=detail)
+class AuthorizationRequestInvalidException(AppException):
+    def __init__(self, detail: str = "Invalid authorization request."):
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail)
 
 
-class InvalidTokenException(HTTPException):
-    def __init__(self, detail: str = "Invalid token. The provided token is not valid."):
-        super().__init__(status_code=401, detail=detail)
+class AuthorizationRequestExpiredException(AppException):
+    def __init__(self, detail: str = "Authorization request expired."):
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail)
 
 
-class ExpiredTokenException(HTTPException):
-    def __init__(self, detail: str = "Token has expired. Please re-authenticate."):
-        super().__init__(status_code=401, detail=detail)
+class InvalidScope(AppException):
+    def __init__(self, detail: str = "The requested scope is invalid, unknown, or not allowed for this client."):
+        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
 
 
-class TokenDecodeException(HTTPException):
-    def __init__(self, detail: str = "Error decoding token. The token format may be invalid."):
-        super().__init__(status_code=401, detail=detail)
+# 401 UNAUTHORIZED
+class LoginFailedException(AppException):
+    def __init__(self, detail: str = "Invalid username or password."):
+        super().__init__(status.HTTP_401_UNAUTHORIZED, detail)
 
 
-# 403
-class InvalidAuthenticationSchemeException(HTTPException):
+class ClientAuthFailedException(AppException):
+    def __init__(self, detail: str = "Invalid client secret or id."):
+        super().__init__(status.HTTP_401_UNAUTHORIZED, detail)
+
+
+class InvalidClientRedirectURIException(AppException):
+    def __init__(self, detail: str = "Invalid client redirect uri."):
+        super().__init__(status.HTTP_401_UNAUTHORIZED, detail)
+
+
+class InvalidTokenException(AppException):
+    def __init__(self, detail: str = "Invalid token."):
+        super().__init__(status.HTTP_401_UNAUTHORIZED, detail)
+
+
+class ExpiredTokenException(AppException):
+    def __init__(self, detail: str = "Token has expired."):
+        super().__init__(status.HTTP_401_UNAUTHORIZED, detail)
+
+
+class TokenDecodeException(AppException):
+    def __init__(self, detail: str = "Token decoding failed."):
+        super().__init__(status.HTTP_401_UNAUTHORIZED, detail)
+
+
+# 403 FORBIDDEN
+class InvalidAuthenticationSchemeException(AppException):
     def __init__(self, detail: str = "Invalid authentication scheme."):
-        super().__init__(status_code=403, detail=detail)
+        super().__init__(status.HTTP_403_FORBIDDEN, detail)
 
 
-class InvalidAPIKeyException(HTTPException):
+class InvalidAPIKeyException(AppException):
     def __init__(self, detail: str = "Invalid API key."):
-        super().__init__(status_code=403, detail=detail)
+        super().__init__(status.HTTP_403_FORBIDDEN, detail)
 
 
-# 404
-class UserNotFoundException(HTTPException):
+# 404 NOT FOUND
+class UserNotFoundException(AppException):
     def __init__(self, detail: str = "User not found."):
-        super().__init__(status_code=400, detail=detail)
+        super().__init__(status.HTTP_404_NOT_FOUND, detail)
 
 
-class ClientNotFoundException(HTTPException):
+class ClientNotFoundException(AppException):
     def __init__(self, detail: str = "Client not found."):
-        super().__init__(status_code=400, detail=detail)
+        super().__init__(status.HTTP_404_NOT_FOUND, detail)
 
 
-# 409
-class ConflictedUserException(HTTPException):
-    def __init__(self, detail: str = "Conflict: user already exists."):
-        super().__init__(status_code=409, detail=detail)
+# 409 CONFLICT
+class ConflictedUserException(AppException):
+    def __init__(self, detail: str = "User already exists."):
+        super().__init__(status.HTTP_409_CONFLICT, detail)
 
 
-class ConflictedClientException(HTTPException):
-    def __init__(self, detail: str = "Conflict: Client already exists."):
-        super().__init__(status_code=409, detail=detail)
+class ConflictedClientException(AppException):
+    def __init__(self, detail: str = "Client already exists."):
+        super().__init__(status.HTTP_409_CONFLICT, detail)
 
 
-# 413
-class ContextLengthExceededException(HTTPException):
+# 413 PAYLOAD TOO LARGE
+class ContextLengthExceededException(AppException):
     def __init__(self, detail: str = "Context length exceeded."):
-        super().__init__(status_code=413, detail=detail)
+        super().__init__(status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail)
 
 
-class FileSizeLimitExceededException(HTTPException):
+class FileSizeLimitExceededException(AppException):
     def __init__(self, detail: str = "File size limit exceeded."):
-        super().__init__(status_code=413, detail=detail)
+        super().__init__(status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail)
 
 
-# 422
-class InvalidJSONFormatException(HTTPException):
-    def __init__(self, detail: str = "Invalid JSON file format."):
-        super().__init__(status_code=422, detail=detail)
+# 422 UNPROCESSABLE ENTITY
+class InvalidJSONFormatException(AppException):
+    def __init__(self, detail: str = "Invalid JSON format."):
+        super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, detail)
 
 
-class InvalidFieldsException(HTTPException):
-    def __init__(self, detail: str = "Some fields are invalid format."):
-        super().__init__(status_code=422, detail=detail)
+class InvalidFieldsException(AppException):
+    def __init__(self, detail: str = "One or more fields have invalid format."):
+        super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, detail)
 
 
-class UnsupportedFileTypeException(HTTPException):
+class UnsupportedFileTypeException(AppException):
     def __init__(self, detail: str = "Unsupported file type."):
-        super().__init__(status_code=422, detail=detail)
+        super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, detail)
