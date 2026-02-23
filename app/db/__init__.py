@@ -1,17 +1,10 @@
 # coding: utf-8
 
-from sqlalchemy.ext.declarative import declarative_base
-
-from app.db.sqlalchemy_engine import engine
-from app.db.sqlalchemy_session import SessionLocal
-from app.db.sqlalchemy_session import get_db
+from app.db.sqlalchemy_manager import engine, get_db, Base
 
 
 __all__ = [
     'engine',
-    'SessionLocal',
-    'Base',
     'get_db',
+    'Base',
 ]
-
-Base = declarative_base()
