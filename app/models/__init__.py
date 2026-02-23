@@ -2,7 +2,11 @@
 
 from app.models.client import Client
 from app.models.user import User
+from app.models.oauth import OAuthAuthorizationRequest, OAuthAuthorizationCode
 
 __all__ = [
-    'Client', 'User',
+    'Client',
+    'User',
+    'OAuthAuthorizationRequest',
+    'OAuthAuthorizationCode',
 ]

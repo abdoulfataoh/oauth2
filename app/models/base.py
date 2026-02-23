@@ -1,25 +1,28 @@
 # coding: utf-8
 
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, String
 from uuid import uuid4
 from datetime import datetime
-import pytz
 
-from sqlalchemy import (
-    Column,
-    String,
-    DateTime,
-)
-
-from app.db import Base
+from app.utils.datetime import utcnow
 
 
-__all__ = [
-    'Base',
-]
-
-
-class BaseModelMixin(Base):
+class BaseModelMixin:
     __abstract__ = True
-    id = Column(String(64), primary_key=True, default=lambda: str(uuid4()))
-    created_at = Column(DateTime, default=lambda x: datetime.now(tz=pytz.utc))
-    edited_at = Column(DateTime, onupdate=lambda x: datetime.now(tz=pytz.utc))
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True,
+        default=lambda: str(uuid4())
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utcnow
+    )
+
+    edited_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        onupdate=utcnow,
+        default=utcnow
+    )
