@@ -3,36 +3,32 @@
 from pydantic import BaseModel, ConfigDict
 from pydantic import Field, SecretStr, EmailStr
 
-from app.schemas._base import IdMixin, TimestampMixin
+from app.schemas.base import BaseORM
 
 
-__all__ = [
-    'UserBase',
-    'UserCreate',
-    'UserUpdate',
-    'User',
-]
+class UserCommon(BaseModel):
+    email: EmailStr
+    phone: str | None = Field(min_length=8, max_length=32)
 
 
 class UserBase(BaseModel):
-    firstname: str | None = None
+    firstname: str
     lastname: str | None = None
 
 
-class UserCommon(UserBase):
-    email: EmailStr | None = None
-    phone_number: str | None = Field(min_length=8, max_length=32)
-
-
-class UserUpdate(UserCommon):
-    roles: list[str] | str = 'user'
-
-
-class UserCreate(UserCommon):
+class UserCreate(UserBase, UserCommon):
     password: SecretStr
 
 
-class User(IdMixin, UserCommon, TimestampMixin):
+class UserInfoUpdate(UserBase):
+    pass
+
+
+class UserEmailUpdate(BaseModel):
+    email: EmailStr
+
+
+class User(BaseORM, UserBase, UserCommon):
     """
     User in DB representation
     """
@@ -40,6 +36,3 @@ class User(IdMixin, UserCommon, TimestampMixin):
     username: str
     roles: list[str] | str = 'user'
     disabled: bool | None = None
-
-    def model_post_init(self, __context):
-        self.roles = self.roles.split(',')

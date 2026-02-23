@@ -3,29 +3,28 @@
 from pydantic import BaseModel, ConfigDict
 from pydantic import SecretStr
 
-from app.schemas._base import IdMixin, TimestampMixin
-
-
-__all__ = [
-    'ClientBase',
-    'ClientCreate',
-    'Client',
-]
+from app.schemas.base import BaseORM
 
 
 class ClientBase(BaseModel):
-    client_secret: SecretStr
-
-
-class ClientCreate(BaseModel):
-    redirect_uri: str
     client_name: str
+    redirect_uri: str
+    allowed_scopes: list[str]
 
 
-class Client(IdMixin, ClientCreate, TimestampMixin):
-    """
-    Client in DB representation
-    """
-    model_config = ConfigDict(from_attributes=True)
-    client_secret: str
+class ClientCreate(ClientBase):
+    pass
+
+
+class ClientRead(BaseORM, ClientBase):
     client_id: str
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ClientDB(BaseORM, ClientBase):
+    """
+    Client DB representation
+    """
+    client_id: str
+    client_secret: SecretStr
+    model_config = ConfigDict(from_attributes=True)
