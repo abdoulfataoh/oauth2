@@ -13,5 +13,5 @@ class Client(BaseModelMixin, Base):
     client_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     client_secret: Mapped[str] = mapped_column(String, nullable=False)
     redirect_uri: Mapped[str] = mapped_column(String(2048), unique=True, nullable=False)
-    client_name: Mapped[str | None] = mapped_column(String, nullable=False, default='')
-    allowed_scopes: Mapped[list[str]] = mapped_column(JSON)
+    client_name: Mapped[str] = mapped_column(String, nullable=False)
+    allowed_scopes: Mapped[str] = mapped_column(JSON)
