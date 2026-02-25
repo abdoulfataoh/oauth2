@@ -16,12 +16,7 @@ class ClientCreate(ClientBase):
     pass
 
 
-class ClientRead(BaseORM, ClientBase):
-    client_id: str
-    model_config = ConfigDict(from_attributes=True)
-
-
-class ClientDB(BaseORM, ClientBase):
+class Client(BaseORM, ClientBase):
     """
     Client DB representation
     """
