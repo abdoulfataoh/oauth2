@@ -49,6 +49,16 @@ class InvalidScope(AppException):
         super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
 
 
+class InvalidCodeChallengeMethod(AppException):
+    def __init__(self, detail: str = "The code challenge methode is invalid."):
+        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+
+
+class InvalidCodeChallenge(AppException):
+    def __init__(self, detail: str = "The code challenge is invalid."):
+        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+
+
 # 401 UNAUTHORIZED
 class LoginFailedException(AppException):
     def __init__(self, detail: str = "Invalid username or password."):
