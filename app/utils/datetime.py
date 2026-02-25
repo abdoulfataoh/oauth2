@@ -1,14 +1,10 @@
 # coding: utf-8
 
-from datetime import datetime
-from zoneinfo import ZoneInfo
-
-from app import settings
+from datetime import datetime, timezone
 
 
-def now():
+def utcnow() -> datetime:
     """
-    Return current time
-    based on settings timezone
+    Return current UTC datetime
     """
-    return datetime.now(tz=ZoneInfo(settings.TIMEZONE))
+    return datetime.now(tz=timezone.utc)
