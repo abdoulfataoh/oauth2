@@ -1,11 +1,11 @@
 # coding: utf-8
 
 from uuid import uuid4
-from passlib.context import CryptContext
 import secrets
-from datetime import datetime, timedelta
-import pytz
+from datetime import datetime, timedelta, timezone
+
 import jwt
+from passlib.context import CryptContext
 
 from app import settings
 from app.utils.exceptions import (
@@ -37,6 +37,7 @@ def generate_username(firstname: str, lastname: str) -> str:
     """
     slug = uuid4().hex[:3]
     username = f'{firstname}.{lastname}.{slug}'.lower()
+    username = username.replace(' ', '')
     return username
 
 
@@ -52,7 +53,7 @@ def create_jwt(expires_in: int = 3600, **kwargs):
         str: signed JWT.
     """
 
-    tz = pytz.timezone(settings.OAUTH_TIMEZONE)
+    tz = timezone.utc
     secret_key = settings.JWT_SECRET_KEY
     jwt_algorithm = settings.JWT_ALGORITHM
 
@@ -78,7 +79,7 @@ def decode_jwt(token: str) -> dict:
         dict: jwt paylod.
 
     Raises:
-        HTTPException: token exceptions.
+        JWT: token exceptions.
     """
     secret_key = settings.JWT_SECRET_KEY
     jwt_algorithm = settings.JWT_ALGORITHM
