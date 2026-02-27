@@ -1,7 +1,6 @@
 # coding: utf-8
 
 from pydantic import BaseModel, ConfigDict
-from pydantic import SecretStr
 
 from app.schemas.base import BaseORM
 
@@ -21,5 +20,4 @@ class Client(BaseORM, ClientBase):
     Client DB representation
     """
     client_id: str
-    client_secret: SecretStr
     model_config = ConfigDict(from_attributes=True)
