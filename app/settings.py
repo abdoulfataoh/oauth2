@@ -28,20 +28,12 @@ DATABASE_PASSWORD = env.str('DATABASE_PASSWORD', default='')
 DATABASE_NAME = env.str('DATABASE_NAME', default='')
 
 DATABASES_URL_TEMPLATES = {
-    'sqlite3': {
-        'url': 'sqlite+aiosqlite:///db.sqlite3',
-    },
-
-    'mysql': {
-        'url': 'mysql://{username}:{password}@{server}/{database}'
-    },
-
-    'postgresql': {
-        'url': 'postgresql://{username}:{password}@{server}/{database}'
-    }
+    'sqlite3': 'sqlite+aiosqlite:///db.sqlite3',
+    'mysql': 'mysql://{username}:{password}@{server}/{database}',
+    'postgresql': 'postgresql://{username}:{password}@{server}/{database}',
 }
 
-DATABASE_URL = DATABASES_URL_TEMPLATES[DATABASE_TYPE]['url'].format(
+DATABASE_URL = DATABASES_URL_TEMPLATES[DATABASE_TYPE].format(
     database=DATABASE_NAME, server=DATABASE_SERVER,
     username=DATABASE_USERNAME, password=DATABASE_PASSWORD,
 )
