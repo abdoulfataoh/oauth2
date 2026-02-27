@@ -65,11 +65,23 @@ async def get_client_by_client_id_service(
     return db_client
 
 
-async def delete_client_by_client_id_service(
+async def get_client_by_id_service(
     db: AsyncSession,
     client_id: str,
 ) -> M.Client:
-    db_client = await crud.delete_client_by_client_id(db, client_id)
+    db_client = await crud.get_client_by_id(db, client_id)
+
+    if not db_client:
+        raise ClientNotFoundException
+
+    return db_client
+
+
+async def delete_client_by_id_service(
+    db: AsyncSession,
+    client_id: str,
+) -> M.Client:
+    db_client = await crud.delete_client_by_id(db, client_id)
 
     if not db_client:
         raise ClientNotFoundException
