@@ -31,7 +31,6 @@ async def get_current_user(
 
     try:
         payload = decode_jwt(token)
-        username = payload.get('sub')
 
     except ExpiredSignatureError:
         raise ExpiredTokenException
@@ -39,6 +38,11 @@ async def get_current_user(
         raise InvalidTokenException
     except DecodeError:
         raise TokenDecodeException
+
+    username = payload.get('sub')
+
+    if username is None:
+        raise InvalidTokenException
 
     db_user = await get_user_by_username_service(
         username=username,
@@ -54,7 +58,7 @@ async def get_current_user(
 async def get_optional_user(
     token: str = Depends(oauth2_scheme),
     db: AsyncSession = Depends(get_db),
-) -> M.User:
+) -> M.User | None:
 
     try:
         payload = decode_jwt(token)
