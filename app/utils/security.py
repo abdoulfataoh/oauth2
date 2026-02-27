@@ -8,9 +8,6 @@ import jwt
 from passlib.context import CryptContext
 
 from app import settings
-from app.utils.exceptions import (
-    InvalidTokenException, ExpiredTokenException, TokenDecodeException
-)
 
 pwd_context = CryptContext(schemes=['argon2'], deprecated='auto')
 
@@ -77,9 +74,6 @@ def decode_jwt(token: str) -> dict:
 
     Returns:
         dict: jwt paylod.
-
-    Raises:
-        JWT: token exceptions.
     """
     secret_key = settings.JWT_SECRET_KEY
     jwt_algorithm = settings.JWT_ALGORITHM
@@ -89,16 +83,8 @@ def decode_jwt(token: str) -> dict:
             options={'verify_aud': False}
         )
 
-    try:
-        decoded_payload = jwt.decode(
-            token, secret_key, algorithms=[jwt_algorithm],
-            options={'verify_aud': False}
-        )
-        return decoded_payload
-
-    except jwt.ExpiredSignatureError:
-        raise ExpiredTokenException
-    except jwt.exceptions.InvalidTokenError:
-        raise InvalidTokenException
-    except jwt.DecodeError:
-        raise TokenDecodeException
+    decoded_payload = jwt.decode(
+        token, secret_key, algorithms=[jwt_algorithm],
+        options={'verify_aud': False}
+    )
+    return decoded_payload
