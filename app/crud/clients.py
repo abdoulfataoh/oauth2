@@ -52,14 +52,24 @@ async def get_client_by_client_id(
     return result.scalars().first()
 
 
-async def update_client_scopes(
+async def get_client_by_id(
+    db: AsyncSession,
+    client_id: str,
+) -> M.Client | None:
+    result = await db.execute(
+        select(M.Client).where(M.Client.id == client_id)
+    )
+    return result.scalars().first()
+
+
+async def update_client_scopes_by_id(
     db: AsyncSession,
     *,
     client_id: str,
     allowed_scopes: list[str],
 ) -> M.Client | None:
     result = await db.execute(
-        select(M.Client).where(M.Client.client_id == client_id)
+        select(M.Client).where(M.Client.id == client_id)
     )
     db_client = result.scalars().first()
 
@@ -72,12 +82,12 @@ async def update_client_scopes(
     return db_client
 
 
-async def delete_client_by_client_id(
+async def delete_client_by_id(
     db: AsyncSession,
     client_id: str,
 ) -> M.Client | None:
     result = await db.execute(
-        select(M.Client).where(M.Client.client_id == client_id)
+        select(M.Client).where(M.Client.id == client_id)
     )
     db_client = result.scalars().first()
 

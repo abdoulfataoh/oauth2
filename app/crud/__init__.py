@@ -13,7 +13,8 @@ from app.crud.clients import (
     create_client,
     get_clients,
     get_client_by_client_id,
-    delete_client_by_client_id,
+    get_client_by_id,
+    delete_client_by_id,
 )
 
 from app.crud.oauth_authorization_request import (
@@ -44,7 +45,8 @@ __all__ += [
     'create_client',
     'get_clients',
     'get_client_by_client_id',
-    'delete_client_by_client_id',
+    'get_client_by_id',
+    'delete_client_by_id',
 ]
 
 __all__ += [
