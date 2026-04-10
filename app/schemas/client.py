@@ -21,3 +21,9 @@ class Client(BaseORM, ClientBase):
     """
     client_id: str
     model_config = ConfigDict(from_attributes=True)
+
+
+class ClientFull(ClientBase):
+    client_id: str
+    client_secret: str
+    model_config = ConfigDict(from_attributes=True)
