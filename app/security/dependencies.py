@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_db
 from app import crud
 from app import models as M
-from app.exceptions.http import InvalidTokenException
+from app.exceptions.domain import AuthenticationRequiredError
 
 
 __all__ = [
@@ -73,7 +73,7 @@ async def get_current_user_from_cookie(
     )
 
     if not result:
-        raise InvalidTokenException
+        raise AuthenticationRequiredError()
 
     db_user, _ = result
     return db_user

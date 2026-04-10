@@ -5,7 +5,7 @@ from typing import Annotated, TypeAlias
 from fastapi import Depends
 
 from app import models as M
-from app.exceptions.http import PermissionDeniedException
+from app.exceptions.domain import PermissionDeniedError
 from app.security.dependencies import CurrentUser
 
 __all__ = [
@@ -23,7 +23,7 @@ def require_roles(*roles: str):
         user_roles = user.roles or []
 
         if not any(role in roles for role in user_roles):
-            raise PermissionDeniedException()
+            raise PermissionDeniedError()
 
         return user
 
