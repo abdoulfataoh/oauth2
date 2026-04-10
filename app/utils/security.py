@@ -28,6 +28,10 @@ def generate_secret(length: int = 16) -> str:
     return secret
 
 
+def generate_otp() -> str:
+    return str(secrets.randbelow(900000) + 100000)
+
+
 def generate_username(firstname: str, lastname: str) -> str:
     """
     Generate an username from user informations
