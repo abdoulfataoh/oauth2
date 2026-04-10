@@ -1,10 +1,12 @@
 # coding: utf-8
 
 from app.schemas.client import ClientBase, ClientCreate, Client
-from app.schemas.user import UserBase, UserCreate, UserInfoUpdate, User
+from app.schemas.user import UserBase, UserCreate, UserInfoUpdate, User, UserPasswordUpdate
 from app.schemas.token import Token
 from app.schemas.consent import Consent
+from app.schemas.session import UserSession
 
+from app.schemas.otp import OtpCheck, OtpRequest, ResetPassword
 
 __all__ = [
     'ClientBase',
@@ -14,6 +16,11 @@ __all__ = [
     'UserCreate',
     'UserInfoUpdate',
     'User',
+    'UserPasswordUpdate',
     'Token',
     'Consent',
+    'UserSession',
+    'OtpCheck',
+    'OtpRequest',
+    'ResetPassword',
 ]
