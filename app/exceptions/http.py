@@ -44,19 +44,49 @@ class AuthorizationRequestExpiredException(AppException):
         super().__init__(status.HTTP_400_BAD_REQUEST, detail)
 
 
-class InvalidScope(AppException):
+class InvalidScopeException(AppException):
     def __init__(self, detail: str = "The requested scope is invalid, unknown, or not allowed for this client."):
         super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
 
 
-class InvalidCodeChallengeMethod(AppException):
+class InvalidCodeChallengeMethodException(AppException):
     def __init__(self, detail: str = "The code challenge methode is invalid."):
         super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
 
 
-class InvalidCodeChallenge(AppException):
+class InvalidCodeChallengeException(AppException):
     def __init__(self, detail: str = "The code challenge is invalid."):
         super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+
+
+# class VerificationNotFoundException(AppException):
+#     def __init__(self, detail: str = "Verification not found."):
+#         super().__init__(status.HTTP_400_BAD_REQUEST, detail)
+
+
+class InvalidOtpException(AppException):
+    def __init__(self, detail: str = "Invalid OTP."):
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail)
+
+
+# class InvalidVerificationTokenException(AppException):
+#     def __init__(self, detail: str = "Invalid verification token."):
+#         super().__init__(status.HTTP_400_BAD_REQUEST, detail)
+
+
+class OtpExpiredException(AppException):
+    def __init__(self, detail: str = "OTP expired."):
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail)
+
+
+# class VerificationTokenExpiredException(AppException):
+#     def __init__(self, detail: str = "Verification token expired."):
+#         super().__init__(status.HTTP_400_BAD_REQUEST, detail)
+
+
+class TooManyVerificationAttemptsException(AppException):
+    def __init__(self, detail: str = "Too many verification attempts."):
+        super().__init__(status.HTTP_400_BAD_REQUEST, detail)
 
 
 # 401 UNAUTHORIZED
@@ -98,6 +128,11 @@ class InvalidAuthenticationSchemeException(AppException):
 
 class InvalidAPIKeyException(AppException):
     def __init__(self, detail: str = "Invalid API key."):
+        super().__init__(status.HTTP_403_FORBIDDEN, detail)
+
+
+class PermissionDeniedException(AppException):
+    def __init__(self, detail: str = "Permission Denied."):
         super().__init__(status.HTTP_403_FORBIDDEN, detail)
 
 
@@ -148,3 +183,9 @@ class InvalidFieldsException(AppException):
 class UnsupportedFileTypeException(AppException):
     def __init__(self, detail: str = "Unsupported file type."):
         super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, detail)
+
+
+# 500
+class InternalServerError(AppException):
+    def __init__(self, detail: str = "Internal server error"):
+        super().__init__(status.HTTP_500_INTERNAL_SERVER_ERROR, detail)
