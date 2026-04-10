@@ -1,77 +1,83 @@
 # coding: utf-8
 
-from fastapi import Depends
-from fastapi.security import OAuth2AuthorizationCodeBearer
+from typing import Annotated
+
+from fastapi import Request, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from jwt import PyJWTError, ExpiredSignatureError, DecodeError
-from jwt.exceptions import InvalidTokenError
 
 from app.db import get_db
+from app import crud
 from app import models as M
-from app.services.users import get_user_by_username_service
-from app.utils.security import decode_jwt
-from app.utils.exceptions import LoginFailedException
-from app.utils.exceptions import (
-    InvalidTokenException, ExpiredTokenException, TokenDecodeException
-)
+from app.exceptions.http import InvalidTokenException
 
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    tokenUrl='oauth2/login',
-    authorizationUrl='oauth2/authorize',
-    scopes={'openid': 'OpenID Connect scope', 'profile': 'User profile'},
-    auto_error=False
-)
+__all__ = [
+    'CurrentUser',
+    'CurrentOptionalUser',
+]
 
 
-async def get_current_user(
-        token: str = Depends(oauth2_scheme),
-        db: AsyncSession = Depends(get_db),
-) -> M.User:
+async def _get_user_from_cookie_with_session(
+    request: Request,
+    db: AsyncSession,
+) -> tuple[M.User, M.UserSession] | None:
 
-    try:
-        payload = decode_jwt(token)
+    token = request.cookies.get('ui_access_token')
 
-    except ExpiredSignatureError:
-        raise ExpiredTokenException
-    except InvalidTokenError:
-        raise InvalidTokenException
-    except DecodeError:
-        raise TokenDecodeException
+    if not token:
+        return None
 
-    username = payload.get('sub')
+    db_session = await crud.get_session_by_session_id(db, token)
 
-    if username is None:
-        raise InvalidTokenException
+    if not db_session:
+        return None
 
-    db_user = await get_user_by_username_service(
-        username=username,
-        db=db
+    db_user = await crud.get_user_by_id(db, db_session.user_id)
+
+    if not db_user or db_user.disabled:
+        return None
+
+    await crud.update_session_activity(
+        db,
+        session_id=db_session.session_id,
     )
 
-    if db_user.disabled:
-        raise LoginFailedException('User Disabled')
-
-    return db_user
+    return db_user, db_session
 
 
-async def get_optional_user(
-    token: str = Depends(oauth2_scheme),
+async def get_optional_user_from_cookie(
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ) -> M.User | None:
 
-    try:
-        payload = decode_jwt(token)
-        username = payload['sub']
+    result = await _get_user_from_cookie_with_session(
+        request,
+        db,
+    )
 
-        db_user = await get_user_by_username_service(
-            username=username,
-            db=db
-        )
-
-        if db_user.disabled:
-            raise LoginFailedException('User Disabled')
-    except (PyJWTError, ExpiredSignatureError, InvalidTokenError, DecodeError):
+    if not result:
         return None
 
+    db_user, _ = result
     return db_user
+
+
+async def get_current_user_from_cookie(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> M.User:
+
+    result = await _get_user_from_cookie_with_session(
+        request,
+        db,
+    )
+
+    if not result:
+        raise InvalidTokenException
+
+    db_user, _ = result
+    return db_user
+
+
+CurrentUser = Annotated[M.User, Depends(get_current_user_from_cookie)]
+CurrentOptionalUser = Annotated[M.User, Depends(get_optional_user_from_cookie)]
