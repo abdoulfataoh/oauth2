@@ -159,6 +159,11 @@ class InvalidCodeChallengeMethodError(DomainException):
     message = "Invalid code challenge method."
 
 
+class InvalidResetPasswordError(DomainException):
+    error_code = "INVALID_REQUEST"
+    message = "Invalid reset password error."
+
+
 # OTP
 class InvalidOtpError(DomainException):
     error_code = "INVALID_OTP"
