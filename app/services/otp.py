@@ -16,7 +16,9 @@ from app.exceptions.domain import (
     OtpExpiredError,
     TooManyVerificationAttemptsError,
     InvalidOtpError,
+    InvalidResetPasswordError,
     UserNotFoundError,
+    DomainException,
 )
 
 
@@ -209,29 +211,33 @@ async def validate_password_change_service(
     new_password: str,
 ) -> M.User:
 
-    if not user_id:
-        raise InvalidOtpError("Invalid OTP")
+    try:
+        if not user_id:
+            raise UserNotFoundError()
 
-    db_otp = await _validate_otp(
-        db,
-        user_id=user_id,
-        recipient=recipient,
-        otp_type='change_password',
-        channel=channel,
-        code=code,
-        consume=True,
-    )
+        db_otp = await _validate_otp(
+            db,
+            user_id=user_id,
+            recipient=recipient,
+            otp_type='change_password',
+            channel=channel,
+            code=code,
+            consume=True,
+        )
 
-    if not db_otp.user_id:
-        raise UserNotFoundError()
+        if not db_otp.user_id:
+            raise UserNotFoundError()
 
-    user = await crud.get_user_by_id(db, db_otp.user_id)
-    if not user:
-        raise UserNotFoundError()
+        user = await crud.get_user_by_id(db, db_otp.user_id)
+        if not user:
+            raise UserNotFoundError()
 
-    user.password_hash = hash_password(new_password)
+        user.password_hash = hash_password(new_password)
 
-    await db.commit()
-    await db.refresh(user)
+        await db.commit()
+        await db.refresh(user)
+
+    except DomainException:
+        raise InvalidResetPasswordError()
 
     return user
