@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from uuid import UUID
+
 from sqlalchemy import String, ForeignKey, Boolean, DateTime, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
@@ -11,7 +13,7 @@ from app.models.base import BaseModelMixin
 class OAuthAuthorizationRequest(BaseModelMixin, Base):
     __tablename__ = 'oauth_authorization_requests'
 
-    client_id: Mapped[str] = mapped_column(
+    client_id: Mapped[UUID] = mapped_column(
         ForeignKey('oauth_clients.id', ondelete='CASCADE'),
         nullable=False
     )
@@ -26,7 +28,7 @@ class OAuthAuthorizationRequest(BaseModelMixin, Base):
         default='S256'
     )
 
-    user_id: Mapped[str | None] = mapped_column(
+    user_id: Mapped[UUID | None] = mapped_column(
         ForeignKey('oauth_users.id', ondelete='SET NULL'),
         nullable=True
     )
@@ -57,7 +59,7 @@ class OAuthAuthorizationCode(BaseModelMixin, Base):
         nullable=False
     )
 
-    user_id: Mapped[str] = mapped_column(
+    user_id: Mapped[UUID] = mapped_column(
         ForeignKey('oauth_users.id', ondelete='CASCADE'),
         nullable=False
     )
