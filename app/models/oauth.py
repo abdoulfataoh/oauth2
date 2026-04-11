@@ -51,7 +51,9 @@ class OAuthAuthorizationCode(BaseModelMixin, Base):
 
     code: Mapped[str] = mapped_column(
         String(128),
-        primary_key=True
+        index=True,
+        unique=True,
+        nullable=False
     )
 
     client_id: Mapped[str] = mapped_column(
