@@ -14,8 +14,8 @@ from app import settings
 pwd_context = CryptContext(schemes=['argon2'], deprecated='auto')
 
 
-def hash_sh256(content: str) -> str:
-    return hashlib.sha256(content.encode('utf-8')).digest
+def hash_sha256(content: str) -> bytes:
+    return hashlib.sha256(content.encode('utf-8')).digest()
 
 
 def hash_password(password: str) -> str:
@@ -38,7 +38,7 @@ def generate_otp() -> str:
     return str(secrets.randbelow(900000) + 100000)
 
 
-def encode_base64(content: str) -> str:
+def encode_base64(content: bytes) -> str:
     return base64.urlsafe_b64encode(content).rstrip(b'=').decode()
 
 
