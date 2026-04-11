@@ -1,6 +1,6 @@
 <div align="center">
   <p>
-    <a href="https://pypi.org/project/fastapi_oauth2_service/"><img src="https://github.com/abdoulfataoh/fastapi-oauth2-service/blob/master/docs/icon.png" style="width:80px;height:80px;"></a>
+    <img src="docs/icon.png" style="width:80px;height:80px;">
   </p>
   <a href="https://git.io/typing-svg">
     <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=E9205E&width=170&lines=Oauth2+service" alt="Typing SVG" />
@@ -11,30 +11,76 @@
   <p>
     <a href="https://github.com/abdoulfataoh/fastapi-oauth2-service/actions/workflows/test.yaml"><img src="https://github.com/abdoulfataoh/fastapi-oauth2-service/actions/workflows/test.yaml/badge.svg"></a>
   </p>
-  <p>A FastAPI-based OAuth2 service that enables secure user authentication and authorization, providing token management and API access control for seamless integration with applications.</p>
+  <p>
+    A secure OAuth2 authorization server built with FastAPI, implementing the Authorization Code Flow with PKCE for internal and SaaS applications. 
+    It provides user authentication, OTP verification, and a consent-based authorization system with strong security and clean architecture.
+</p>
 </div>
 
 ### Features
-- [x] CRUD Users
-- [x] Reset User Password via email or sms
-- [x] Admin UI panel
+
+- [x] OAuth2 Authorization Code Flow with PKCE
+- [x] Secure access and refresh token management (JWT)
+- [x] Public user registration with OTP verification (email/SMS)
+- [x] User authentication and consent-based authorization
+- [x] OAuth client (application) registration and management
+- [x] Scope-based access control
+- [x] Token expiration and revocation
+- [x] Protection against user enumeration and brute-force attacks
+- [x] Admin panel for managing users and OAuth clients
+- [x] Built with FastAPI and clean, modular architecture
 
 ### Oauth2 code Flow
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': 'transparent', 'secondaryColor': 'transparent', 'tertiaryColor': 'transparent', 'actorTextColor': '#000000', 'lineColor': '#00FF00', 'primaryBorderColor': '#9c1ca3'}}}%%
+
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#f5f5f5',
+    'secondaryColor': '#e3f2fd',
+    'tertiaryColor': '#e8f5e9',
+    'primaryBorderColor': '#90caf9',
+    'lineColor': '#546e7a',
+    'actorTextColor': '#263238',
+    'fontSize': '18px'
+  }
+}}%%
 
 sequenceDiagram
     participant User
-    participant Client as ClientApplication
-    participant Auth as AuthenticationBackend
+    participant Browser
+    participant Frontend as Frontend(UI React)
+    participant Client as ClientBackend
+    participant Auth as AuthorizationServer
 
-    User->>Client: 1. Request App access.
-    Client-->>User: 2. 302 Redirect User to Auth.
-    User->>Auth: 3. Connect to Auth and grant access to the app using the user's username, password and 2FA.
-    Auth-->>User: 4. 302 Redirect to App, Return authorization code.
-    User->>Client: 5. Connect to App and provide authorization code.
-    Client->>Auth: 6. Request Exchange authorization using an access code.
-    Auth-->>Client: 7. Return access token.
+    User->>Frontend: 1. Click "Login with OAuth"
+
+    Frontend-->>Browser: 2. Redirect to /authorize
+    Browser->>Auth: 3. GET /authorize
+
+    alt User not authenticated
+        Auth-->>Browser: 4. Redirect /login?request_id=xxx
+        Browser->>Frontend: 5. Load /login page
+        User->>Frontend: 6. Submit login form
+        Frontend->>Auth: 7. POST /login
+        Auth-->>Browser: 8. Set cookie + redirect /consent
+    else User authenticated
+        Auth-->>Browser: 4b. Redirect /consent
+    end
+
+    Browser->>Frontend: 9. Load /consent?request_id=xxx
+    Frontend->>Auth: 10. GET /consent-data
+
+    User->>Frontend: 11. Click approve
+    Frontend->>Auth: 12. POST /consent
+
+    Auth-->>Browser: 13. Redirect to client callback with code
+    Browser->>Client: 14. GET /callback?code=xxx
+
+    Client->>Auth: 15. POST /token (code + PKCE)
+    Auth-->>Client: 16. Return access_token
+
+
 ```
 
