@@ -30,57 +30,59 @@
 - [x] Admin panel for managing users and OAuth clients
 - [x] Built with FastAPI and clean, modular architecture
 
-### Oauth2 code Flow
+### Oauth2 code Flow with PKCE Diagram
 
 ```mermaid
 
-%%{init: {
-  'theme': 'base',
-  'themeVariables': {
-    'primaryColor': '#f5f5f5',
-    'secondaryColor': '#e3f2fd',
-    'tertiaryColor': '#e8f5e9',
-    'primaryBorderColor': '#90caf9',
-    'lineColor': '#546e7a',
-    'actorTextColor': '#263238',
-    'fontSize': '18px'
-  }
-}}%%
-
 sequenceDiagram
     participant User
-    participant Browser
-    participant Frontend as Frontend(UI React)
-    participant Client as ClientBackend
-    participant Auth as AuthorizationServer
+    participant ClientApp
+    participant AuthServerFront
+    participant AuthServerBackend
 
-    User->>Frontend: 1. Click "Login with OAuth"
+    %% Step 0: Entry point
+    User->>ClientApp: Request application access
 
-    Frontend-->>Browser: 2. Redirect to /authorize
-    Browser->>Auth: 3. GET /authorize
+    %% Step 1: Start OAuth
+    User->>ClientApp: Click "Login with OAuth"
+    ClientApp-->>User: Redirect /authorize
+    User->>AuthServerBackend: GET /authorize
 
+    %% Step 2: Auth check
     alt User not authenticated
-        Auth-->>Browser: 4. Redirect /login?request_id=xxx
-        Browser->>Frontend: 5. Load /login page
-        User->>Frontend: 6. Submit login form
-        Frontend->>Auth: 7. POST /login
-        Auth-->>Browser: 8. Set cookie + redirect /consent
-    else User authenticated
-        Auth-->>Browser: 4b. Redirect /consent
+        AuthServerBackend-->>User: Redirect /login?request_id=xxx
+        User->>AuthServerFront: Load /login
+        User->>AuthServerFront: Submit credentials
+        AuthServerFront->>AuthServerBackend: POST /login
+        AuthServerBackend-->>User: Set cookie + redirect /consent
+    else User already authenticated
+        AuthServerBackend-->>User: Redirect /consent?request_id=xxx
     end
 
-    Browser->>Frontend: 9. Load /consent?request_id=xxx
-    Frontend->>Auth: 10. GET /consent-data
+    %% Step 3: Consent
+    User->>AuthServerFront: Load /consent
+    AuthServerFront->>AuthServerBackend: GET /consent-data
 
-    User->>Frontend: 11. Click approve
-    Frontend->>Auth: 12. POST /consent
+    alt User approves
+        User->>AuthServerFront: Click "Approve"
+        AuthServerFront->>AuthServerBackend: POST /consent
 
-    Auth-->>Browser: 13. Redirect to client callback with code
-    Browser->>Client: 14. GET /callback?code=xxx
+        AuthServerBackend-->>User: Redirect client/callback?code=xxx&state=xxx
+        User->>ClientApp: GET /callback
 
-    Client->>Auth: 15. POST /token (code + PKCE)
-    Auth-->>Client: 16. Return access_token
+        %% Step 4: Token exchange
+        ClientApp->>AuthServerBackend: POST /token (code + code_verifier)
 
+        alt Code valid
+            AuthServerBackend-->>ClientApp: access_token
+        else Invalid code
+            AuthServerBackend-->>ClientApp: error
+        end
+
+    else User denies
+        User->>AuthServerFront: Click "Deny"
+        AuthServerFront->>AuthServerBackend: POST /consent (deny)
+        AuthServerBackend-->>User: Redirect with error=access_denied
+    end
 
 ```
-
