@@ -46,6 +46,7 @@ async def signup(
         user_id=db_user.id,
         recipient=recipient,
         channel=channel,
+        expire_seconds=settings.OTP_EXPIRE_SECOND,
         otp_type='signup',
     )
 
@@ -58,7 +59,7 @@ async def signup(
 
     session = await services.create_session(
         db=db,
-        user=db_user,
+        user_id=db_user.id,
         user_agent=user_agent,
         ip_address=ip_address,
         device_type=user_device['device_type'],
@@ -72,9 +73,9 @@ async def signup(
         key='ui_access_token',
         value=session.session_id,
         httponly=True,
-        secure=settings.UI_ACCESS_COOKIES_ONLY_ON_HTTPS,
+        secure=settings.UI_COOKIES_ONLY_ON_HTTPS,
         samesite='lax',
-        max_age=settings.UI_ACCESS_COOKIES_EXPIRE_MINUTES * 60,
+        max_age=settings.UI_COOKIES_EXPIRE_SECONDS,
     )
 
     return to_user_schema(db_user)
@@ -96,6 +97,7 @@ async def request_reset_password(
             user_id=db_user.id,
             recipient=payload.recipient,
             channel=payload.channel,
+            expire_seconds=settings.OTP_EXPIRE_SECOND,
             otp_type='change_password',
         )
 
@@ -120,6 +122,7 @@ async def verify_reset_password(
         channel=payload.channel,
         code=payload.otp,
         otp_type='change_password',
+        max_attempts=settings.OTP_MAX_ATTEMPTS,
     )
 
 
@@ -144,6 +147,7 @@ async def reset_password(
         channel=payload.channel,
         code=payload.otp,
         new_password=payload.new_password,
+        max_attempts=settings.OTP_MAX_ATTEMPTS,
     )
 
     return to_user_schema(db_user)
@@ -200,6 +204,7 @@ async def resend_signup_otp(
         recipient=recipient,
         channel=channel,
         otp_type='signup',
+        expire_seconds=settings.OTP_EXPIRE_SECOND,
     )
 
 
@@ -216,6 +221,7 @@ async def verify_signup(
         channel=payload.channel,
         recipient=payload.recipient,
         code=payload.otp,
+        max_attempts=settings.OTP_MAX_ATTEMPTS,
     )
 
     return to_user_schema(db_user)
@@ -233,6 +239,7 @@ async def request_contact_change(
         recipient=payload.recipient,
         otp_type=f'change_{payload.channel}',
         channel=payload.channel,
+        expire_seconds=settings.OTP_EXPIRE_SECOND,
     )
 
 
@@ -249,6 +256,7 @@ async def verify_contact_change(
         recipient=payload.recipient,
         channel=payload.channel,
         code=payload.otp,
+        max_attempts=settings.OTP_MAX_ATTEMPTS,
     )
 
     return to_user_schema(db_user)
@@ -263,7 +271,7 @@ async def get_my_sessions(
 ) -> list[S.UserSession]:
 
     token = request.cookies.get('ui_access_token')
-    db_sessions = await services.get_my_sessions(db, current_user)
+    db_sessions = await services.get_my_sessions(db, user_id=current_user.id)
 
     sessions = [S.UserSession.model_validate(session) for session in db_sessions]
 

@@ -67,7 +67,7 @@ async def login(
 
     session = await services.create_session(
         db=db,
-        user=db_user,
+        user_id=db_user.id,
         user_agent=user_agent,
         ip_address=ip_address,
         device_type=user_device['device_type'],
@@ -105,9 +105,9 @@ async def login(
         key='ui_access_token',
         value=ui_access_token,
         httponly=True,
-        secure=settings.UI_ACCESS_COOKIES_ONLY_ON_HTTPS,
+        secure=settings.UI_COOKIES_ONLY_ON_HTTPS,
         samesite='lax',
-        max_age=settings.UI_ACCESS_COOKIES_EXPIRE_MINUTES,
+        max_age=settings.UI_COOKIES_EXPIRE_SECONDS,
     )
 
     return response
@@ -135,6 +135,7 @@ async def authorize(
             state=state,
             code_challenge=code_challenge,
             code_challenge_method=code_challenge_method,
+            expire_seconds=settings.REQUEST_AUTHORIZATION_EXPIRE_SECONDS,
             db=db,
         )
 
@@ -211,7 +212,7 @@ async def consent(
             request_id=request_id,
             user_id=user.id,
             approved=True,
-            db_request=db_request,
+            expire_seconds=settings.REQUEST_AUTHORIZATION_EXPIRE_SECONDS,
             db=db,
         )
 
