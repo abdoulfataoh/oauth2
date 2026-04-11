@@ -70,6 +70,7 @@ class OAuthAuthorizationCode(BaseModelMixin, Base):
     )
 
     scopes: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    state: Mapped[str] = mapped_column(String(256), nullable=False)
 
     code_challenge: Mapped[str] = mapped_column(
         String(256),
