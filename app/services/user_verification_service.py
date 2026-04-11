@@ -7,11 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
 from app import models as M
-
 from app.utils.security import generate_otp
 from app.utils.datetime import utcnow, is_expired
 from app.utils.security import hash_password
-
 from app.exceptions.domain import (
     OtpExpiredError,
     TooManyVerificationAttemptsError,
@@ -122,6 +120,7 @@ async def validate_otp_without_consume(
     otp_type: str,
     channel: str,
     code: str,
+    max_attempts: int
 ) -> M.Otp:
 
     if not user_id:
@@ -134,6 +133,7 @@ async def validate_otp_without_consume(
         otp_type=otp_type,
         channel=channel,
         code=code,
+        max_attempts=max_attempts,
         consume=False,
     )
 
@@ -149,6 +149,7 @@ async def validate_signup(
     channel: str,
     recipient: str,
     code: str,
+    max_attempts: int,
 ) -> M.User:
 
     await _validate_otp(
@@ -158,6 +159,7 @@ async def validate_signup(
         otp_type='signup',
         channel=channel,
         code=code,
+        max_attempts=max_attempts,
         consume=True,
     )
 
@@ -179,6 +181,7 @@ async def validate_contact_change(
     recipient: str,
     channel: str,
     code: str,
+    max_attempts: int,
 ) -> M.User:
 
     db_otp = await _validate_otp(
@@ -188,6 +191,7 @@ async def validate_contact_change(
         otp_type=f'change_{channel}',
         channel=channel,
         code=code,
+        max_attempts=max_attempts,
         consume=True,
     )
 
@@ -211,6 +215,7 @@ async def validate_password_change(
     channel: str,
     code: str,
     new_password: str,
+    max_attempts: int,
 ) -> M.User:
 
     try:
@@ -224,6 +229,7 @@ async def validate_password_change(
             otp_type='change_password',
             channel=channel,
             code=code,
+            max_attempts=max_attempts,
             consume=True,
         )
 

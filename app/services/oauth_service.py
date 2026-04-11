@@ -10,7 +10,7 @@ from app import models as M
 
 from app.utils.datetime import utcnow, is_expired
 from app.utils.security import generate_secret, create_jwt
-from app.utils.security import encode_base64, hash_sh256
+from app.utils.security import encode_base64, hash_sha256
 
 from app.exceptions.domain import (
     ClientAuthenticationFailedError, InvalidClientRedirectURIError,
@@ -92,7 +92,7 @@ async def get_authorization_request_by_id(
 
     if not db_request:
         raise AuthorizationRequestInvalidError()
-    
+
     if is_expired(db_request.expires_at):
         raise AuthorizationRequestExpiredError()
 
@@ -110,17 +110,17 @@ async def attach_user_to_request(
         request_id=request_id,
     )
 
+    if not db_request:
+        raise AuthorizationRequestInvalidError()
+
     if db_request.user_id or db_request.approved:
         raise AuthorizationRequestAlreadyBoundError()
 
-    db_request = await crud.attach_user_to_authorization_request(
+    await crud.attach_user_to_authorization_request(
         db=db,
         request_id=request_id,
         user_id=user_id,
     )
-
-    if not db_request:
-        raise AuthorizationRequestInvalidError()
 
     return db_request
 
@@ -132,7 +132,6 @@ async def approve_consent(
     expire_seconds: int,
     db: AsyncSession,
 ) -> M.OAuthAuthorizationCode:
-    
 
     db_request = await get_authorization_request_by_id(
         db, request_id=request_id
@@ -172,7 +171,7 @@ async def approve_consent(
 
 async def exchange_code2_token(
     user_id: UUID,
-    client_id: UUID,
+    client_id: str,
     authorization_id: UUID,
 
     grant_type: str,
@@ -182,30 +181,30 @@ async def exchange_code2_token(
     expire_seconds: int,
     db: AsyncSession
 ):
-    
+
     if grant_type != 'authorization_code':
-        raise ...
-        
+        raise
+
     db_authorization_code = await crud.get_authorization_code(
         db=db,
         code=code_verifier
     )
-    
+
     if not db_authorization_code:
-        raise ...
+        raise
 
     if not client_id == db_authorization_code.client_id:
-        raise ...
-    
+        raise
+
     if not redirect_uri == db_authorization_code.redirect_uri:
         raise
 
     if is_expired(db_authorization_code.expires_at):
-        raise ...
-    
-    code_verifier = encode_base64(hash_sh256(code_verifier))
+        raise
+
+    code_verifier = encode_base64(hash_sha256(code_verifier))
     if not code_verifier == db_authorization_code.code_challenge:
-        raise ...
+        raise
 
     db_user = await crud.get_user_by_id(
         db=db,
@@ -216,6 +215,12 @@ async def exchange_code2_token(
         db=db,
         client_id=client_id
     )
+
+    if not db_user:
+        raise
+
+    if not db_client:
+        raise
 
     token = create_jwt(
         expires_in=expire_seconds,
