@@ -1,29 +1,33 @@
 # coding: utf-8
 
-from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.endpoints import health, auth, user, client
-from app.utils.exceptions_handlers import validation_exception_handler
+from app.routes import health, oauth, user, client
+from app.exceptions.handlers import register_exception_handlers
+
+from app import settings
 
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[settings.OAUTH_UI_URI],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=['*'],
+    allow_methods=[
+        'GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'
+    ]
 )
 
-app.add_exception_handler(RequestValidationError, validation_exception_handler)
+register_exception_handlers(app)
 
-app.include_router(health.router, tags=['Monitoring'])
+api_router = APIRouter(prefix=settings.OAUTH_API_PREFIX)
 
-app.include_router(auth.router, tags=['Auth'])
+api_router.include_router(health.router, tags=['Monitoring'])
+api_router.include_router(oauth.router, tags=['Auth'])
+api_router.include_router(user.router, tags=['User'])
+api_router.include_router(client.router, tags=['Client apps'])
 
-app.include_router(user.router, tags=['User'])
-
-app.include_router(client.router, tags=['Client Application'])
+app.include_router(api_router)
