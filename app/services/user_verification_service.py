@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import settings, crud
+from app import crud
 from app import models as M
 
 from app.utils.security import generate_otp
@@ -35,10 +35,11 @@ async def send_otp(
     recipient: str,
     otp_type: str,
     channel: str,
+    expire_seconds: int
 ) -> str:
 
     code = generate_otp()
-    expires_at = utcnow() + timedelta(minutes=settings.OTP_EXPIRE_MINUTES)
+    expires_at = utcnow() + timedelta(seconds=expire_seconds)
 
     existing_otp = await crud.get_otp(
         db,
@@ -81,6 +82,7 @@ async def _validate_otp(
     otp_type: str,
     channel: str,
     code: str,
+    max_attempts: int,
     consume: bool = True
 
 ) -> M.Otp:
@@ -99,7 +101,7 @@ async def _validate_otp(
     if is_expired(db_otp.expires_at):
         raise OtpExpiredError("OTP expired")
 
-    if db_otp.attempts >= settings.MAX_ATTEMPTS:
+    if db_otp.attempts >= max_attempts:
         raise TooManyVerificationAttemptsError("Too many attempts")
 
     if db_otp.code != code:
