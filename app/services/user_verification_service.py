@@ -230,16 +230,16 @@ async def validate_password_change(
         if not db_otp.user_id:
             raise UserNotFoundError()
 
-        user = await crud.get_user_by_id(db, db_otp.user_id)
-        if not user:
+        db_user = await crud.get_user_by_id(db, db_otp.user_id)
+        if not db_user:
             raise UserNotFoundError()
 
-        user.password_hash = hash_password(new_password)
+        db_user.password_hash = hash_password(new_password)
 
         await db.commit()
-        await db.refresh(user)
+        await db.refresh(db_user)
 
     except DomainException:
         raise InvalidResetPasswordError()
 
-    return user
+    return db_user
