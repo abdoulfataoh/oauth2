@@ -28,7 +28,7 @@ def resolve_otp_recipient(user):
     return channel, recipient
 
 
-async def send_otp_service(
+async def send_otp(
     db: AsyncSession,
     *,
     user_id: UUID,
@@ -141,7 +141,7 @@ async def validate_otp_without_consume(
     return db_otp
 
 
-async def validate_signup_service(
+async def validate_signup(
     db: AsyncSession,
     user_id: UUID,
     channel: str,
@@ -171,7 +171,7 @@ async def validate_signup_service(
     return db_user
 
 
-async def validate_contact_change_service(
+async def validate_contact_change(
     db: AsyncSession,
     user_id: UUID,
     recipient: str,
@@ -202,7 +202,7 @@ async def validate_contact_change_service(
     return db_user
 
 
-async def validate_password_change_service(
+async def validate_password_change(
     db: AsyncSession,
     user_id: UUID | None,
     recipient: str,

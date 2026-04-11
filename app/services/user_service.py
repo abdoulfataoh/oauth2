@@ -24,7 +24,7 @@ def _validate_contact(email: str | None, phone: str | None) -> None:
         raise InvalidFieldsError("Provide either email or phone, not both at singup")
 
 
-async def signup_service(
+async def signup(
     db: AsyncSession,
     user: S.UserCreate,
 ) -> M.User:
@@ -67,7 +67,7 @@ async def signup_service(
         raise
 
 
-async def create_user_service(
+async def create_user(
     db: AsyncSession,
     user: S.UserCreate,
 ) -> M.User:
@@ -110,7 +110,7 @@ async def create_user_service(
         raise
 
 
-async def update_user_by_id_service(
+async def update_user_by_id(
     db: AsyncSession,
     user_id: UUID,
     user: S.UserInfoUpdate,
@@ -130,7 +130,7 @@ async def update_user_by_id_service(
     return db_user
 
 
-async def get_user_by_id_service(
+async def get_user_by_id(
     db: AsyncSession,
     user_id: UUID,
 ) -> M.User:
@@ -143,7 +143,7 @@ async def get_user_by_id_service(
     return db_user
 
 
-async def get_user_by_username_service(
+async def get_user_by_username(
     db: AsyncSession,
     username: str,
 ) -> M.User:
@@ -171,7 +171,7 @@ async def silent_get_user_by_contact(
     return db_user
 
 
-async def get_users_service(
+async def get_users(
     db: AsyncSession,
     skip: int = 0,
     limit: int = 10,
@@ -180,7 +180,7 @@ async def get_users_service(
     return list(await crud.get_users(db, skip, limit))
 
 
-async def delete_user_by_id_service(
+async def delete_user_by_id(
     db: AsyncSession,
     user_id: UUID,
 ) -> M.User:
@@ -193,14 +193,14 @@ async def delete_user_by_id_service(
     return db_user
 
 
-async def update_user_password_service(
+async def update_user_password(
     db: AsyncSession,
     user_id: UUID,
     old_password: str,
     new_password: str,
 ) -> M.User:
 
-    db_user = await get_user_by_id_service(
+    db_user = await get_user_by_id(
         db,
         user_id=user_id
     )
@@ -217,7 +217,7 @@ async def update_user_password_service(
     return db_user
 
 
-async def authenticate_user_service(
+async def authenticate_user(
     db: AsyncSession,
     identifier: str,
     password: str,

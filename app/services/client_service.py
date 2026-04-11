@@ -15,7 +15,7 @@ from app.exceptions.domain import (
 )
 
 
-async def create_client_service(
+async def create_client(
     db: AsyncSession,
     client: S.ClientCreate,
 ) -> tuple[M.Client, str]:
@@ -49,7 +49,7 @@ async def create_client_service(
     return db_client, client_secret
 
 
-async def get_clients_service(
+async def get_clients(
     db: AsyncSession,
     skip: int = 0,
     limit: int = 10,
@@ -64,7 +64,7 @@ async def get_clients_service(
     return list(clients)
 
 
-async def get_client_by_client_id_service(
+async def get_client_by_client_id(
     db: AsyncSession,
     client_id: str,
 ) -> M.Client:
@@ -80,7 +80,7 @@ async def get_client_by_client_id_service(
     return db_client
 
 
-async def get_client_by_id_service(
+async def get_client_by_id(
     db: AsyncSession,
     client_id: UUID,
 ) -> M.Client:
@@ -96,7 +96,7 @@ async def get_client_by_id_service(
     return db_client
 
 
-async def delete_client_by_id_service(
+async def delete_client_by_id(
     db: AsyncSession,
     client_id: UUID,
 ) -> M.Client:
