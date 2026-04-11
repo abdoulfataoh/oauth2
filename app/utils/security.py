@@ -6,10 +6,16 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 from passlib.context import CryptContext
+import hashlib
+import base64
 
 from app import settings
 
 pwd_context = CryptContext(schemes=['argon2'], deprecated='auto')
+
+
+def hash_sh256(content: str) -> str:
+    return hashlib.sha256(content.encode('utf-8')).digest
 
 
 def hash_password(password: str) -> str:
@@ -30,6 +36,10 @@ def generate_secret(length: int = 16) -> str:
 
 def generate_otp() -> str:
     return str(secrets.randbelow(900000) + 100000)
+
+
+def encode_base64(content: str) -> str:
+    return base64.urlsafe_b64encode(content).rstrip(b'=').decode()
 
 
 def generate_username(firstname: str, lastname: str) -> str:
