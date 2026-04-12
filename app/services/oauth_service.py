@@ -71,7 +71,7 @@ async def request_authorize(
 
     db_request = await crud.create_authorization_request(
         db=db,
-        client_id=db_client.id,
+        client_id=db_client.client_id,
         redirect_uri=redirect_uri,
         scopes=sorted(set(scopes)),
         state=state,
