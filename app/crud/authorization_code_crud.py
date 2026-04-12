@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import update
 from sqlalchemy.future import select
 
 from app import models as M
@@ -61,23 +62,23 @@ async def mark_authorization_code_as_used(
     code: str,
 ) -> M.OAuthAuthorizationCode | None:
 
-    result = await db.execute(
-        select(M.OAuthAuthorizationCode)
+    stmt = (
+        update(M.OAuthAuthorizationCode)
         .where(
             M.OAuthAuthorizationCode.code == code,
             M.OAuthAuthorizationCode.used.is_(False),
         )
+        .values(used=True)
+        .returning(M.OAuthAuthorizationCode)
     )
 
-    db_code = result.scalars().first()
+    result = await db.execute(stmt)
+    db_code = result.scalar_one_or_none()
 
     if not db_code:
         return None
 
-    db_code.used = True
-
     await db.commit()
-    await db.refresh(db_code)
 
     return db_code
 
