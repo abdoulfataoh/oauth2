@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import logging
 from datetime import timedelta
 from uuid import UUID
 
@@ -17,8 +18,12 @@ from app.exceptions.domain import (
     AuthorizationRequestInvalidError, AuthorizationRequestExpiredError,
     AuthorizationRequestAlreadyBoundError, InvalidScopeError,
     InvalidCodeChallengeError, InvalidCodeChallengeMethodError,
-    UnsupportedResponseTypeError,
+    UnsupportedResponseTypeError, UnsupportedGrantTypeError, InvalidAuthorizationCodeError,
+    UserNotFoundError, ClientNotFoundError, PermissionDeniedError
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 async def request_authorize(
@@ -37,6 +42,9 @@ async def request_authorize(
     if response_type != 'code':
         raise UnsupportedResponseTypeError()
 
+    if not (43 <= len(code_challenge) <= 128):
+        raise InvalidCodeChallengeError("Code challenge with length >=43 & <=128 is required")
+
     if not scopes:
         raise InvalidScopeError("At least one scope is required")
 
@@ -44,9 +52,6 @@ async def request_authorize(
         raise InvalidCodeChallengeMethodError(
             "Only S256 code challenge method is supported"
         )
-
-    if not code_challenge:
-        raise InvalidCodeChallengeError("Code challenge is required")
 
     db_client = await crud.get_client_by_client_id(
         db=db,
@@ -113,7 +118,7 @@ async def attach_user_to_request(
     if not db_request:
         raise AuthorizationRequestInvalidError()
 
-    if db_request.user_id or db_request.approved:
+    if db_request.user_id is not None:
         raise AuthorizationRequestAlreadyBoundError()
 
     await crud.attach_user_to_authorization_request(
@@ -131,14 +136,17 @@ async def approve_consent(
     approved: bool,
     expire_seconds: int,
     db: AsyncSession,
-) -> M.OAuthAuthorizationCode:
+) -> M.OAuthAuthorizationCode | None:
 
     db_request = await get_authorization_request_by_id(
         db, request_id=request_id
     )
 
-    if db_request.approved:
+    if db_request.approved is not None:
         raise AuthorizationRequestAlreadyBoundError()
+
+    if user_id != db_request.user_id:
+        raise PermissionDeniedError()
 
     await crud.approve_authorization_request(
         db=db,
@@ -146,34 +154,34 @@ async def approve_consent(
         approved=approved,
     )
 
-    code = generate_secret(32)
+    if approved:
 
-    db_code = await crud.create_authorization_code(
-        db=db,
-        code=code,
-        client_id=db_request.client_id,
-        user_id=user_id,
-        redirect_uri=db_request.redirect_uri,
-        scopes=db_request.scopes,
-        state=db_request.state,
-        code_challenge=db_request.code_challenge,
-        code_challenge_method=db_request.code_challenge_method,
-        expires_at=utcnow() + timedelta(
-            seconds=expire_seconds,
-        ),
-    )
+        code = generate_secret(32)
 
-    if not db_code:
-        raise AuthorizationRequestInvalidError()
+        db_code = await crud.create_authorization_code(
+            db=db,
+            code=code,
+            client_id=db_request.client_id,
+            user_id=user_id,
+            redirect_uri=db_request.redirect_uri,
+            scopes=db_request.scopes,
+            state=db_request.state,
+            code_challenge=db_request.code_challenge,
+            code_challenge_method=db_request.code_challenge_method,
+            expires_at=utcnow() + timedelta(
+                seconds=expire_seconds,
+            ),
+        )
 
-    return db_code
+        if not db_code:
+            raise AuthorizationRequestInvalidError()
+
+        return db_code
+    return None
 
 
-async def exchange_code2_token(
-    user_id: UUID,
+async def exchange_code_to_token(
     client_id: str,
-    authorization_id: UUID,
-
     grant_type: str,
     authorization_code: str,
     redirect_uri: str,
@@ -183,50 +191,68 @@ async def exchange_code2_token(
 ):
 
     if grant_type != 'authorization_code':
-        raise
+        raise UnsupportedGrantTypeError(
+            "Invalid grant_type, only 'authorization_code' supported."
+        )
 
-    db_authorization_code = await crud.get_authorization_code(
+    if not (43 <= len(code_verifier) <= 128):
+        logger.warning("Invalid code_verifier length")
+        raise InvalidAuthorizationCodeError()
+
+    db_authorization_code = await crud.mark_authorization_code_as_used(
         db=db,
-        code=code_verifier
+        code=authorization_code,
     )
 
     if not db_authorization_code:
-        raise
-
-    if not client_id == db_authorization_code.client_id:
-        raise
-
-    if not redirect_uri == db_authorization_code.redirect_uri:
-        raise
+        logger.warning("Authorization code invalid or already used")
+        raise InvalidAuthorizationCodeError()
 
     if is_expired(db_authorization_code.expires_at):
-        raise
+        logger.warning("Authorization code expired")
+        raise InvalidAuthorizationCodeError()
 
-    code_verifier = encode_base64(hash_sha256(code_verifier))
-    if not code_verifier == db_authorization_code.code_challenge:
-        raise
+    if client_id != db_authorization_code.client_id:
+        logger.warning("Client authentication failed")
+        raise InvalidAuthorizationCodeError()
+
+    if redirect_uri != db_authorization_code.redirect_uri:
+        logger.warning("Invalid client redirect URI")
+        raise InvalidAuthorizationCodeError()
+
+    if db_authorization_code.code_challenge_method != 'S256':
+        logger.warning("Only S256 code challenge method is supported")
+        raise InvalidAuthorizationCodeError()
+
+    computed_challenge = encode_base64(hash_sha256(code_verifier))
+
+    if computed_challenge != db_authorization_code.code_challenge:
+        logger.warning("Invalid code Cchallenge")
+        raise InvalidAuthorizationCodeError()
 
     db_user = await crud.get_user_by_id(
         db=db,
         user_id=db_authorization_code.user_id
     )
 
+    if not db_user:
+        raise UserNotFoundError()
+
     db_client = await crud.get_client_by_client_id(
         db=db,
         client_id=client_id
     )
 
-    if not db_user:
-        raise
-
     if not db_client:
-        raise
+        raise ClientNotFoundError()
 
-    token = create_jwt(
+    access_token = create_jwt(
         expires_in=expire_seconds,
         sub=db_user.username,
-        iss='oauth server',
-        aud=db_client.client_name,
+        iss='oauth-server',
+        aud=db_client.client_id,
+        scope=' '.join(db_authorization_code.scopes),
+        jti=generate_secret(16)
     )
 
-    return token
+    return access_token
