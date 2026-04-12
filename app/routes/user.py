@@ -12,7 +12,7 @@ from app import schemas as S
 from app import models as M
 from app.db import get_db
 from app.security.dependencies import CurrentUser
-from app.security.permissions import AdminUser
+from app.security.permissions import AdminUser, ReadUserToken
 from app.utils.devices import parse_device
 from app import services
 
@@ -172,6 +172,12 @@ async def update_me_password(
 @router.get('/users/me', response_model=S.User)
 async def me(current_user: CurrentUser) -> S.User:
     return to_user_schema(current_user)
+
+
+# Client
+@router.get('/users/userinfo', response_model=S.User)
+async def userinfo(user: ReadUserToken, db: DB) -> S.User:
+    return to_user_schema(user)
 
 
 @router.put('/users/me', response_model=S.User)
