@@ -1,11 +1,8 @@
 # coding: utf-8
 
-from typing import Literal, Union
-from pydantic import BaseModel, EmailStr
-
-
-class Channel(BaseModel):
-    channel: Literal['email', 'phone']
+from typing import Literal, Annotated
+from pydantic import BaseModel, EmailStr, Field
+from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
 class Otp(BaseModel):
@@ -16,12 +13,14 @@ class NewPassword(BaseModel):
     new_password: str
 
 
-class OtpRequestEmailChannel(Channel):
+class OtpRequestEmailChannel(BaseModel):
+    channel: Literal['email']
     recipient: EmailStr
 
 
-class OtpRequestPhoneChannel(Channel):
-    recipient: str
+class OtpRequestPhoneChannel(BaseModel):
+    channel: Literal['phone']
+    recipient: PhoneNumber
 
 
 class OtpCheckEmailChannel(OtpRequestEmailChannel, Otp):
@@ -32,9 +31,25 @@ class OtpCheckPhoneChannel(OtpRequestPhoneChannel, Otp):
     pass
 
 
-OtpRequest = Union[OtpRequestEmailChannel, OtpRequestPhoneChannel]
-OtpCheck = Union[OtpCheckEmailChannel, OtpCheckPhoneChannel]
+class ResetPasswordEmail(OtpCheckEmailChannel, NewPassword):
+    pass
 
 
-class ResetPassword(Channel, Otp, NewPassword):
-    recipient: str
+class ResetPasswordPhone(OtpCheckPhoneChannel, NewPassword):
+    pass
+
+
+OtpRequest = Annotated[
+    OtpRequestEmailChannel | OtpRequestPhoneChannel,
+    Field(discriminator='channel')
+]
+
+OtpCheck = Annotated[
+    OtpCheckEmailChannel | OtpCheckPhoneChannel,
+    Field(discriminator='channel')
+]
+
+ResetPassword = Annotated[
+    ResetPasswordEmail | ResetPasswordPhone,
+    Field(discriminator='channel')
+]
