@@ -1,25 +1,26 @@
-# coding: utf-8
-
 name: Test
-
-run-name: Test Workflow
 
 on:
   push:
     branches:
-      - "master"
+      - "*"
+
+env:
+  CONTAINER_NAME: ${{ github.event.repository.name }}
+  IMAGE_NAME: ${{ github.event.repository.name }}
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Test
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests
         run: |
-          sudo apt-get update
-          sudo curl -sSL https://install.python-poetry.org | python3 -
-          poetry config virtualenvs.in-project true
-          poetry install
-          export PATH=".venv/bin:$PATH"
-          make flake8
-          make mypy
+            pip install poetry
+            poetry config virtualenvs.in-project true
+            poetry install --no-root
+            export PATH=".venv/bin:$PATH"
+            make test-all

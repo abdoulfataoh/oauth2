@@ -19,7 +19,6 @@ help:
 	@echo "make lint          - Run linter"
 	@echo "make docker-build  - Build docker image"
 	@echo "make test-all  	  - Test all"
-	@echo "make reset	  	  - Reset dev DB & cache"
 
 dev:
 	fastapi dev $(APP) --host 0.0.0.0 --port $(PORT)
@@ -46,7 +45,3 @@ docker-build:
 
 test-all: lint test
 	@echo "All test are OK"
-
-reset:
-	rm -f db.sqlite3
-	rm -rf **/__pycache__
