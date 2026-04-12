@@ -159,6 +159,11 @@ class InvalidCodeChallengeMethodError(DomainException):
     message = "Invalid code challenge method."
 
 
+class InvalidAuthorizationCodeError(DomainException):
+    error_code = "INVALID_AUTHORIZATION_CODE"
+    message = "Invalid authorization code."
+
+
 class InvalidResetPasswordError(DomainException):
     error_code = "INVALID_REQUEST"
     message = "Invalid reset password error."
