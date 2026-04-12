@@ -2,7 +2,7 @@
 
 from app.schemas.client import ClientBase, ClientCreate, Client
 from app.schemas.user import UserBase, UserCreate, UserInfoUpdate, User, UserPasswordUpdate
-from app.schemas.token import Token
+from app.schemas.token import Token, AccessTokenRequest
 from app.schemas.consent import Consent
 from app.schemas.session import UserSession
 
@@ -18,6 +18,7 @@ __all__ = [
     'User',
     'UserPasswordUpdate',
     'Token',
+    'AccessTokenRequest',
     'Consent',
     'UserSession',
     'OtpCheck',
