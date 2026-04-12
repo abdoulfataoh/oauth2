@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from uuid import uuid4, UUID
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
@@ -20,7 +20,7 @@ async def create_client(
     client: S.ClientCreate,
 ) -> tuple[M.Client, str]:
 
-    client_id = uuid4().hex.upper()
+    client_id = 'app.' + generate_secret(32)
 
     client_secret = generate_secret(32)
     client_secret_hash = hash_password(client_secret)
