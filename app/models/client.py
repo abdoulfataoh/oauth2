@@ -10,7 +10,7 @@ from app.models.base import BaseModelMixin
 class Client(BaseModelMixin, Base):
     __tablename__ = 'oauth_clients'
 
-    client_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    client_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
     client_secret: Mapped[str] = mapped_column(String, nullable=False)
     redirect_uri: Mapped[str] = mapped_column(String(2048), unique=True, nullable=False)
     client_name: Mapped[str] = mapped_column(String, nullable=False)
