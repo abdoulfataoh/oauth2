@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, Request, Query, Form
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import schemas as S
 from app import models as M
 from app import settings
 from app.db import get_db
@@ -151,6 +152,7 @@ async def authorize(
         params = {
             'error': 'invalid_request',
             'state': state,
+            'error_description': 'Invalid client or request parameters'
         }
 
         return RedirectResponse(
@@ -179,6 +181,10 @@ async def authorize(
         'request_id': str(db_request.id),
     }
 
+    print('\n'*20)
+    print(client_id, db_request.client_id)
+    print('********'*20)
+
     return RedirectResponse(
         f'{settings.OAUTH_UI_CONSENT_URL}?{urlencode(params)}',
         status_code=302,
@@ -198,26 +204,24 @@ async def consent(
         request_id=request_id,
     )
 
-    if not approved:
+    db_code = await services.approve_consent(
+        request_id=request_id,
+        user_id=user.id,
+        approved=approved,
+        expire_seconds=settings.REQUEST_AUTHORIZATION_EXPIRE_SECONDS,
+        db=db,
+    )
 
+    if db_code:
         params = {
-            'error': 'access_denied',
-            'error_description': 'The user denied the request',
+            'code': db_code.code,
             'state': db_request.state,
         }
 
     else:
-
-        db_code = await services.approve_consent(
-            request_id=request_id,
-            user_id=user.id,
-            approved=True,
-            expire_seconds=settings.REQUEST_AUTHORIZATION_EXPIRE_SECONDS,
-            db=db,
-        )
-
         params = {
-            'code': db_code.code,
+            'error': 'access_denied',
+            'error_description': 'The user denied the request',
             'state': db_request.state,
         }
 
@@ -229,8 +233,20 @@ async def consent(
     )
 
 
-@router.post('/token')
-async def token():
-    return {
-        'detail': 'Not implemented yet',
-    }
+@router.post('/token', response_model=S.Token)
+async def token(
+    access_token_request: S.AccessTokenRequest,
+    db: AsyncSession = Depends(get_db),
+):
+
+    access_token = await services.exchange_code_to_token(
+        db=db,
+        client_id=access_token_request.client_id,
+        grant_type=access_token_request.grant_type,
+        authorization_code=access_token_request.authorization_code,
+        redirect_uri=access_token_request.redirect_uri,
+        code_verifier=access_token_request.code_verifier,
+        expire_seconds=settings.AUTHORIZATION_CODE_EXPIRE_SECONDS
+    )
+
+    return S.Token(token=access_token, token_type='acces_token')
