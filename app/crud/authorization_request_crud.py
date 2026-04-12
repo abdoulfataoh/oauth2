@@ -12,7 +12,7 @@ from app import models as M
 async def create_authorization_request(
     db: AsyncSession,
     *,
-    client_id: UUID,
+    client_id: str,
     redirect_uri: str,
     scopes: list[str],
     state: str,

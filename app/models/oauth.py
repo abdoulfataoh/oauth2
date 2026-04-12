@@ -13,9 +13,11 @@ from app.models.base import BaseModelMixin
 class OAuthAuthorizationRequest(BaseModelMixin, Base):
     __tablename__ = 'oauth_authorization_requests'
 
-    client_id: Mapped[UUID] = mapped_column(
-        ForeignKey('oauth_clients.id', ondelete='CASCADE'),
-        nullable=False
+    client_id: Mapped[str] = mapped_column(
+        String(128),
+        ForeignKey('oauth_clients.client_id', ondelete='CASCADE'),
+        nullable=False,
+        index=True
     )
 
     redirect_uri: Mapped[str] = mapped_column(String(2048), nullable=False)
@@ -43,7 +45,7 @@ class OAuthAuthorizationRequest(BaseModelMixin, Base):
         nullable=False
     )
 
-    client = relationship('Client')
+    client = relationship('Client', lazy='joined')
 
 
 class OAuthAuthorizationCode(BaseModelMixin, Base):
@@ -57,8 +59,10 @@ class OAuthAuthorizationCode(BaseModelMixin, Base):
     )
 
     client_id: Mapped[str] = mapped_column(
-        ForeignKey('oauth_clients.id', ondelete='CASCADE'),
-        nullable=False
+        String(128),
+        ForeignKey('oauth_clients.client_id', ondelete='CASCADE'),
+        nullable=False,
+        index=True
     )
 
     user_id: Mapped[UUID] = mapped_column(
@@ -95,4 +99,4 @@ class OAuthAuthorizationCode(BaseModelMixin, Base):
         nullable=False
     )
 
-    client = relationship('Client')
+    client = relationship('Client', lazy='joined')

@@ -14,7 +14,7 @@ async def create_authorization_code(
     db: AsyncSession,
     *,
     code: str,
-    client_id: UUID,
+    client_id: str,
     user_id: UUID,
     redirect_uri: str,
     scopes: list[str],
