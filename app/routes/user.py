@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from app import settings
 from app import schemas as S
 from app import models as M
+from app.models import OtpTypeEnum
 from app.db import get_db
 from app.security.dependencies import CurrentUser
 from app.security.permissions import AdminUser, ReadUserToken
@@ -47,7 +48,7 @@ async def signup(
         recipient=recipient,
         channel=channel,
         expire_seconds=settings.OTP_EXPIRE_SECOND,
-        otp_type='signup',
+        otp_type=OtpTypeEnum.SIGNUP,
     )
 
     user_agent = request.headers.get('user-agent', '')
@@ -98,7 +99,7 @@ async def request_reset_password(
             recipient=payload.recipient,
             channel=payload.channel,
             expire_seconds=settings.OTP_EXPIRE_SECOND,
-            otp_type='change_password',
+            otp_type=OtpTypeEnum.CHANGE_PASSWORD,
         )
 
 
@@ -121,7 +122,7 @@ async def verify_reset_password(
         recipient=payload.recipient,
         channel=payload.channel,
         code=payload.otp,
-        otp_type='change_password',
+        otp_type=OtpTypeEnum.CHANGE_PASSWORD,
         max_attempts=settings.OTP_MAX_ATTEMPTS,
     )
 
@@ -209,7 +210,7 @@ async def resend_signup_otp(
         user_id=current_user.id,
         recipient=recipient,
         channel=channel,
-        otp_type='signup',
+        otp_type=OtpTypeEnum.SIGNUP,
         expire_seconds=settings.OTP_EXPIRE_SECOND,
     )
 
@@ -239,11 +240,13 @@ async def request_contact_change(
     payload: S.OtpRequest, db: DB, current_user: CurrentUser
 ) -> None:
 
+    otp_type = OtpTypeEnum(f'change_{payload.channel}')
+
     await services.send_otp(
         db,
         user_id=current_user.id,
         recipient=payload.recipient,
-        otp_type=f'change_{payload.channel}',
+        otp_type=otp_type,
         channel=payload.channel,
         expire_seconds=settings.OTP_EXPIRE_SECOND,
     )

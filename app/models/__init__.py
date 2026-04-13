@@ -5,6 +5,7 @@ from app.models.user import User
 from app.models.oauth import OAuthAuthorizationRequest, OAuthAuthorizationCode
 from app.models.otp import Otp
 from app.models.session import UserSession
+from app.models.enums import OtpTypeEnum
 
 __all__ = [
     'Client',
@@ -13,4 +14,5 @@ __all__ = [
     'OAuthAuthorizationCode',
     'Otp',
     'UserSession',
+    'OtpTypeEnum',
 ]

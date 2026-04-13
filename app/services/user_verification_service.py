@@ -2,11 +2,13 @@
 
 from uuid import UUID
 from datetime import timedelta
+from hmac import compare_digest
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
 from app import models as M
+from app.models import OtpTypeEnum
 from app.utils.security import generate_otp
 from app.utils.datetime import utcnow, is_expired
 from app.utils.security import hash_password
@@ -21,7 +23,7 @@ from app.exceptions.domain import (
 
 
 def resolve_otp_recipient(user):
-    channel = 'email' if user.email else ('sms' if user.phone else None)
+    channel = 'email' if user.email else ('phone' if user.phone else None)
     recipient = user.email or user.phone
     return channel, recipient
 
@@ -31,7 +33,7 @@ async def send_otp(
     *,
     user_id: UUID,
     recipient: str,
-    otp_type: str,
+    otp_type: OtpTypeEnum,
     channel: str,
     expire_seconds: int
 ) -> str:
@@ -43,7 +45,7 @@ async def send_otp(
         db,
         user_id=user_id,
         recipient=recipient,
-        otp_type=otp_type,
+        otp_type=otp_type.value,
         channel=channel,
     )
 
@@ -56,18 +58,9 @@ async def send_otp(
         recipient=recipient,
         channel=channel,
         code=code,
-        otp_type=otp_type,
+        otp_type=otp_type.value,
         expires_at=expires_at,
     )
-
-    print('\n\n\n\n\n\n\n')
-    print('*****************************')
-    print('***********', code, '********')
-    print('***********', otp_type, '********')
-    print('***********', channel, '********')
-    print('***********', recipient, '********')
-    print('*****************************')
-    print('\n\n\n\n\n\n\n')
 
     return code
 
@@ -77,19 +70,18 @@ async def _validate_otp(
     *,
     user_id: UUID,
     recipient: str,
-    otp_type: str,
+    otp_type: OtpTypeEnum,
     channel: str,
     code: str,
     max_attempts: int,
     consume: bool = True
-
 ) -> M.Otp:
 
     db_otp = await crud.get_otp(
         db,
         user_id=user_id,
         recipient=recipient,
-        otp_type=otp_type,
+        otp_type=otp_type.value,
         channel=channel,
     )
 
@@ -102,7 +94,7 @@ async def _validate_otp(
     if db_otp.attempts >= max_attempts:
         raise TooManyVerificationAttemptsError("Too many attempts")
 
-    if db_otp.code != code:
+    if not compare_digest(db_otp.code, code):
         await crud.increment_otp_attempts(db, otp_id=db_otp.id)
         raise InvalidOtpError("Invalid OTP")
 
@@ -117,7 +109,7 @@ async def validate_otp_without_consume(
     *,
     user_id: UUID | None,
     recipient: str,
-    otp_type: str,
+    otp_type: OtpTypeEnum,
     channel: str,
     code: str,
     max_attempts: int
@@ -126,7 +118,7 @@ async def validate_otp_without_consume(
     if not user_id:
         raise InvalidOtpError("Invalid OTP")
 
-    db_otp = await _validate_otp(
+    return await _validate_otp(
         db,
         user_id=user_id,
         recipient=recipient,
@@ -136,11 +128,6 @@ async def validate_otp_without_consume(
         max_attempts=max_attempts,
         consume=False,
     )
-
-    if not db_otp:
-        raise InvalidOtpError("Invalid OTP")
-
-    return db_otp
 
 
 async def validate_signup(
@@ -156,7 +143,7 @@ async def validate_signup(
         db,
         user_id=user_id,
         recipient=recipient,
-        otp_type='signup',
+        otp_type=OtpTypeEnum.SIGNUP,
         channel=channel,
         code=code,
         max_attempts=max_attempts,
@@ -184,11 +171,18 @@ async def validate_contact_change(
     max_attempts: int,
 ) -> M.User:
 
+    if channel == 'email':
+        otp_type = OtpTypeEnum.CHANGE_EMAIL
+    elif channel == 'phone':
+        otp_type = OtpTypeEnum.CHANGE_PHONE
+    else:
+        raise InvalidOtpError("Invalid channel")
+
     db_otp = await _validate_otp(
         db,
         user_id=user_id,
         recipient=recipient,
-        otp_type=f'change_{channel}',
+        otp_type=otp_type,
         channel=channel,
         code=code,
         max_attempts=max_attempts,
@@ -199,8 +193,10 @@ async def validate_contact_change(
     if not db_user:
         raise UserNotFoundError()
 
-    new_contact = db_otp.recipient
-    setattr(db_user, channel, new_contact)
+    if channel == 'email':
+        db_user.email = db_otp.recipient
+    elif channel == 'phone':
+        db_user.phone = db_otp.recipient
 
     await db.commit()
     await db.refresh(db_user)
@@ -226,15 +222,12 @@ async def validate_password_change(
             db,
             user_id=user_id,
             recipient=recipient,
-            otp_type='change_password',
+            otp_type=OtpTypeEnum.CHANGE_PASSWORD,
             channel=channel,
             code=code,
             max_attempts=max_attempts,
             consume=True,
         )
-
-        if not db_otp.user_id:
-            raise UserNotFoundError()
 
         db_user = await crud.get_user_by_id(db, db_otp.user_id)
         if not db_user:
