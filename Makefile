@@ -1,10 +1,10 @@
-# (c) qirelo 2025
+# coding: utf-8
 
 .PHONY: help dev build prod test lint docker-build test-all
 
 PORT ?= 8000
 
-PROJECT_NAME := $(notdir $(CURDIR))
+PROJECT_NAME := $(shell basename "$$(pwd)")
 IMAGE_TAG ?= latest
 IMAGE_SHA ?= unknown
 APP=start.py
@@ -19,6 +19,7 @@ help:
 	@echo "make lint          - Run linter"
 	@echo "make docker-build  - Build docker image"
 	@echo "make test-all  	  - Test all"
+
 
 dev:
 	fastapi dev $(APP) --host 0.0.0.0 --port $(PORT)
