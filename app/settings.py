@@ -29,8 +29,8 @@ DATABASE_NAME = env.str('DATABASE_NAME', default='')
 
 DATABASES_URL_TEMPLATES = {
     'sqlite3': 'sqlite+aiosqlite:///db.sqlite3',
-    'mysql': 'mysql://{username}:{password}@{server}/{database}',
-    'postgresql': 'postgresql://{username}:{password}@{server}/{database}',
+    'mysql': 'mysql+aiomysql://{username}:{password}@{server}/{database}',
+    'postgresql': 'postgresql+asyncpg://{username}:{password}@{server}/{database}',
 }
 
 DATABASE_URL = DATABASES_URL_TEMPLATES[DATABASE_TYPE].format(
