@@ -12,8 +12,7 @@
     <a href="https://github.com/abdoulfataoh/fastapi-oauth2-service/actions/workflows/test.yaml"><img src="https://github.com/abdoulfataoh/fastapi-oauth2-service/actions/workflows/test.yaml/badge.svg"></a>
   </p>
   <p>
-    A secure OAuth2 authorization server built with FastAPI, implementing the Authorization Code Flow with PKCE for internal and SaaS applications. 
-    It provides user authentication, OTP verification, and a consent-based authorization system with strong security and clean architecture.
+    A FastAPI-based authentication server implementing OAuth2 Authorization Code Flow with PKCE, user authentication, OTP verification, and consent-based authorization.
 </p>
 </div>
 
