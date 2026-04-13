@@ -16,7 +16,7 @@ from app.utils.security import hash_password
 
 
 def generate_client_id() -> str:
-    return secrets.token_urlsafe(32)
+    return 'app.' + secrets.token_urlsafe(32)
 
 
 def generate_client_secret() -> str:
