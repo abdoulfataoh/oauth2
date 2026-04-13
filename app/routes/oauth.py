@@ -246,7 +246,7 @@ async def token(
         authorization_code=access_token_request.authorization_code,
         redirect_uri=access_token_request.redirect_uri,
         code_verifier=access_token_request.code_verifier,
-        expire_seconds=settings.AUTHORIZATION_CODE_EXPIRE_SECONDS
+        expire_seconds=settings.ACCESS_TOKEN_EXPIRE_SECONDS
     )
 
     return S.Token(token=access_token, token_type='acces_token')
