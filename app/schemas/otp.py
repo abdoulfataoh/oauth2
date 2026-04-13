@@ -1,8 +1,14 @@
 # coding: utf-8
 
 from typing import Literal, Annotated
+
 from pydantic import BaseModel, EmailStr, Field
-from pydantic_extra_types.phone_numbers import PhoneNumber
+from pydantic_extra_types.phone_numbers import PhoneNumberValidator
+
+PhoneNumber = Annotated[
+    str,
+    PhoneNumberValidator(number_format='E164')
+]
 
 
 class Otp(BaseModel):
