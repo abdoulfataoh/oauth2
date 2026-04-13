@@ -19,15 +19,13 @@
 ### Features
 
 - [x] OAuth2 Authorization Code Flow with PKCE
-- [x] Secure access and refresh token management (JWT)
+- [x] Secure access token (JWT)
 - [x] Public user registration with OTP verification (email/SMS)
 - [x] User authentication and consent-based authorization
 - [x] OAuth client (application) registration and management
 - [x] Scope-based access control
-- [x] Token expiration and revocation
 - [x] Protection against user enumeration and brute-force attacks
 - [x] Admin panel for managing users and OAuth clients
-- [x] Built with FastAPI and clean, modular architecture
 
 ### Oauth2 code Flow with PKCE Diagram
 
@@ -84,4 +82,37 @@ sequenceDiagram
         AuthServerBackend-->>User: Redirect with error=access_denied
     end
 
+```
+
+
+### Usage
+
+```bash
+  make help
+```
+
+```bash
+
+Available commands:
+--------------------------------
+make help            - Display this help message
+make dev             - Run development server
+make prod            - Run production server
+make test            - Run tests
+make lint            - Run linter
+make docker-build    - Build docker image
+make test-all        - Run lint + tests
+
+Database commands:
+--------------------------------
+make db-migrate m='msg' - Create migration
+make db-upgrade        - Apply migrations
+make db-downgrade      - Rollback last migration
+make db-current        - Show current revision
+make db-history        - Show migration history
+make db-reset          - Reset DB (dev only)
+
+Cleanup:
+--------------------------------
+make reset            - Reset DB + clean cache
 ```
