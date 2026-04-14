@@ -27,15 +27,6 @@
 - [x] Protection against user enumeration and brute-force attacks
 - [x] Admin panel for managing users and OAuth clients
 
-
-
-### Requirements
-
-- Python 3.10+
-- PostgreSQL / MySQL / SQLite
-- Make (optional)
-- poetry (optional)
-
 ### Oauth2 code Flow with PKCE Diagram
 
 ```mermaid
