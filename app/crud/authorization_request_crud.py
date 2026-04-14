@@ -120,10 +120,6 @@ async def delete_expired_authorization_requests(
     *,
     now: datetime,
 ) -> int:
-    '''
-    Delete all expired authorization requests.
-    '''
-
     result = await db.execute(
         delete(M.OAuthAuthorizationRequest)
         .where(M.OAuthAuthorizationRequest.expires_at < now)

@@ -4,7 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import update
+from sqlalchemy import update, delete
 from sqlalchemy.future import select
 
 from app import models as M
@@ -85,19 +85,14 @@ async def mark_authorization_code_as_used(
 
 async def delete_expired_authorization_codes(
     db: AsyncSession,
+    *,
     now: datetime,
 ) -> int:
-
     result = await db.execute(
-        select(M.OAuthAuthorizationCode)
+        delete(M.OAuthAuthorizationCode)
         .where(M.OAuthAuthorizationCode.expires_at < now)
     )
 
-    codes = result.scalars().all()
-
-    for code in codes:
-        await db.delete(code)
-
     await db.commit()
 
-    return len(codes)
+    return result.rowcount or 0  # type: ignore[attr-defined]

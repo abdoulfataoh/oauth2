@@ -1,10 +1,11 @@
 # coding: utf-8
 
-from datetime import datetime, timezone
+from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import delete
 
 from app import models as M
 
@@ -102,15 +103,14 @@ async def delete_otp(
 
 async def delete_expired_otp(
     db: AsyncSession,
-) -> None:
-
+    *,
+    now: datetime,
+) -> int:
     result = await db.execute(
-        select(M.Otp).where(
-            M.Otp.expires_at < datetime.now(timezone.utc)
-        )
+        delete(M.Otp)
+        .where(M.Otp.expires_at < now)
     )
 
-    for db_otp in result.scalars().all():
-        await db.delete(db_otp)
-
     await db.commit()
+
+    return result.rowcount or 0  # type: ignore[attr-defined]
