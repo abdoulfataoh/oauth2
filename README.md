@@ -148,66 +148,46 @@ make db-upgrade
 make dev
 ````
 
+### API documentation
+
+- http://localhost:8000/docs
+- [docs/openapi.json](docs/openapi.json)
+
+
 
 ### Project Configuration
 
-This document lists all environment variables used to configure the application.
+This project uses environment variables for configuration. Below is the complete list of variables in a single table.
 
-
-
-###### General Variables
 | Variable | Type | Description | Default |
 |----------|------|-------------|---------|
+| **General** | | | |
 | TEST | bool | Enable test mode | false |
 | DEBUG | bool | Debug mode (linked to TEST) | false |
-
-
-###### Database
-| Variable | Type | Description | Default |
-|----------|------|-------------|---------|
+| **Database** | | | |
 | DATABASE_TYPE | str | Database type (sqlite3, mysql, postgresql) | sqlite3 |
 | DATABASE_SERVER | str | Database host | - |
 | DATABASE_USER | str | Database username | - |
 | DATABASE_PASSWORD | str | Database password | - |
 | DATABASE_NAME | str | Database name | - |
-
-
-###### OAuth UI (Frontend)
-| Variable | Type | Description | Default |
-|----------|------|-------------|---------|
+| **OAuth UI** | | | |
 | OAUTH_UI_URI | str | Frontend base URL | http://localhost:5173 |
-| OAUTH_UI_LOGIN_URL | derived | Login URL | {OAUTH_UI_URI}/login |
-| OAUTH_UI_CONSENT_URL | derived | Consent URL | {OAUTH_UI_URI}/consent |
-| OAUTH_USER_ACCOUNT_URL | derived | User account URL | {OAUTH_UI_URI}/account |
-
-###### Cookies and Sessions
-| Variable | Type | Description | Default |
-|----------|------|-------------|---------|
+| OAUTH_UI_LOGIN_URL | derived | Login URL: `{OAUTH_UI_URI}/login` | - |
+| OAUTH_UI_CONSENT_URL | derived | Consent URL: `{OAUTH_UI_URI}/consent` | - |
+| OAUTH_USER_ACCOUNT_URL | derived | User account URL: `{OAUTH_UI_URI}/account` | - |
+| **Cookies** | | | |
 | UI_COOKIES_EXPIRE_NAME | str | Session cookie name | UI_COOKIES |
 | UI_COOKIES_EXPIRE_SECONDS | int | Expiration duration (seconds) | 10800 |
 | UI_COOKIES_ONLY_ON_HTTPS | bool | Restrict cookies to HTTPS | false |
-
-
-###### Security (JWT and OTP)
-| Variable | Type | Description | Default |
-|----------|------|-------------|---------|
+| **Security** | | | |
 | JWT_SECRET_KEY | str | Secret key for JWT signing | 1234 |
 | JWT_ALGORITHM | str | JWT algorithm | HS256 |
 | OTP_MAX_ATTEMPTS | int | Maximum OTP retries | 5 |
 | OTP_EXPIRE_SECOND | int | OTP expiration (seconds) | 180 |
-
-
-###### OAuth API (Backend)
-| Variable | Type | Description | Default |
-|----------|------|-------------|---------|
+| **API** | | | |
 | OAUTH_API_PREFIX | str | API route prefix | /oauth2 |
 | OAUTH_API_URI | str | Backend base URI | localhost:8000 |
-
-
-
-###### Token Expiration
-| Variable | Type | Description | Default |
-|----------|------|-------------|---------|
+| **Expiration** | | | |
 | REQUEST_AUTHORIZATION_EXPIRE_SECONDS | int | Auth request lifetime | 180 |
 | AUTHORIZATION_CODE_EXPIRE_SECONDS | int | Auth code lifetime | 60 |
 | ACCESS_TOKEN_EXPIRE_SECONDS | int | Access token lifetime | 600 |
